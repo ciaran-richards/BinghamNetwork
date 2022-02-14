@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="NetworkDisplay.NetworkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NetworkDisplay"
+             mc:Ignorable="d" 
+             d:DesignHeight="1000" d:DesignWidth="1000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Canvas Grid.Column="0" x:Name="mycanvas" Margin="20">
+            <Canvas.Background>
+                <DrawingBrush>
+                    <DrawingBrush.Drawing>
+                        <GeometryDrawing Brush="Black" x:Name="GeometryDrawing">
+                            <GeometryDrawing.Geometry>
+                                <GeometryGroup x:Name="GeometryGroup"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingBrush.Drawing>
+                </DrawingBrush>
+            </Canvas.Background>
+            <Path Stroke="Black">
+                <Path.Data>
+                    <PathGeometry x:Name="PathGeometry">
+                    </PathGeometry>
+                </Path.Data>
+            </Path>
+
+        </Canvas>
+    </Grid>
+</UserControl>

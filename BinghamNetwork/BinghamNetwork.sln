@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30330.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkDisplay", "NetworkDisplay.csproj", "{DBD045BC-661C-44E0-9F37-FDEF58ABD928}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainSolver", "..\MainSolver\MainSolver.csproj", "{CC8D205B-5772-450B-8852-DFEFC37E458A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBD045BC-661C-44E0-9F37-FDEF58ABD928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD045BC-661C-44E0-9F37-FDEF58ABD928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD045BC-661C-44E0-9F37-FDEF58ABD928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD045BC-661C-44E0-9F37-FDEF58ABD928}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC8D205B-5772-450B-8852-DFEFC37E458A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC8D205B-5772-450B-8852-DFEFC37E458A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC8D205B-5772-450B-8852-DFEFC37E458A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC8D205B-5772-450B-8852-DFEFC37E458A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9FF2211-9D65-4297-A854-E207AC8B9BFF}
+	EndGlobalSection
+EndGlobal

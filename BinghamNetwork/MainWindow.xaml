@@ -1,0 +1,34 @@
+﻿<Window x:Class="NetworkDisplay.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NetworkDisplay"
+        xmlns:networkDisplay="clr-namespace:NetworkDisplay"
+        xmlns:uc="local.NetworkView.xaml"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <GridSplitter Width="5" VerticalAlignment="Bottom"/>
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
+            <Button Grid.Column="0" Content="Set" Height="50" Click="ButtonBase_OnClick"/>
+            <TextBox Grid.Column="0" Grid.Row="0" Height="25" Background="GhostWhite" x:Name="DisplaceText" 
+                     Text="100"/>
+            <TextBox Grid.Column="0" Grid.Row="0" Height="25" Background="GhostWhite" x:Name="NodesText" 
+                     Text="6"/>
+        </StackPanel>
+        <local:NetworkView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" x:Name="NetworkRegion" Loaded="NetworkView_Loaded">
+
+        </local:NetworkView>
+    </Grid>
+</Window>
