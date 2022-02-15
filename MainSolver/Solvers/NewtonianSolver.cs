@@ -6,7 +6,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace MainSolver
 {
-    class NewtonianSolver
+    public class NewtonianSolver
     {
         public Network Solve(Network net)
         {
@@ -90,7 +90,7 @@ namespace MainSolver
                     {
                         diag = 0;
                         row = new double[M];
-                        //Diagonal Component Calculation
+                       //Diagonal Component Calculation
                         diag -= (net.inv_hLength[p][q] + net.inv_vLength[p][q]);
                         if (p > 0)
                             diag -= (net.inv_hLength[p - 1][q]); //Except Left Boundary

@@ -10,25 +10,26 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Canvas Grid.Column="0" x:Name="mycanvas" Margin="20">
-            <Canvas.Background>
-                <DrawingBrush>
-                    <DrawingBrush.Drawing>
-                        <GeometryDrawing Brush="Black" x:Name="GeometryDrawing">
-                            <GeometryDrawing.Geometry>
-                                <GeometryGroup x:Name="GeometryGroup"/>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                    </DrawingBrush.Drawing>
-                </DrawingBrush>
-            </Canvas.Background>
-            <Path Stroke="Black">
-                <Path.Data>
-                    <PathGeometry x:Name="PathGeometry">
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
-
-        </Canvas>
+        <Viewbox Stretch="Fill">
+            <Canvas Grid.Column="0" x:Name="mycanvas" Margin="10" Width="100" Height="100" >
+                <Canvas.Background>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <GeometryDrawing Brush="Black" x:Name="GeometryDrawing">
+                                <GeometryDrawing.Geometry>
+                                    <GeometryGroup x:Name="GeometryGroup"/>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Canvas.Background>
+                <Path Stroke="Black">
+                    <Path.Data>
+                        <PathGeometry x:Name="PathGeometry">
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+            </Canvas>
+        </Viewbox>
     </Grid>
 </UserControl>

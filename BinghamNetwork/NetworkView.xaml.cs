@@ -31,95 +31,93 @@ namespace NetworkDisplay
         public void DrawNetwork(Network network)
         {
             var N = network.Nodes;
-            int Radius = 100 / N;
-            int LineThickness = Radius / 4;
+            var max = mycanvas.ActualHeight;
+            var scl = max / network.Length;
+            double Radius = 25 * scl / N;
+            int LineThickness = (int)(Radius / 4);
             var capacity = N * N + 4 * N * (N - 1);
             if (N >= 30)
             {
-                capacity = N*N + 2*N*(N-1);
+                capacity = N * N + 2 * N * (N - 1);
                 LineThickness = LineThickness * 2;
             }
             GeometryDrawing.Pen.Thickness = Math.Max(LineThickness, 1);
             GeometryGroup.Children = new GeometryCollection(capacity);
-            for (int i = 0; i < network.Nodes; i++)
-            {
-                for (int j = 0; j < network.Nodes; j++)
-                {
-                    var ellipse = new EllipseGeometry(new Point(network.x[i][j] * 5, network.y[i][j] * 5), Radius, Radius);
-                    GeometryGroup.Children.Add(ellipse);
-                }
-            } 
+            mycanvas.Children.Clear();
 
             //Horizontal Lines
-            for (int i = 0; i < network.Nodes-1; i++)
+            for (int i = 0; i < network.Nodes - 1; i++)
             {
                 for (int j = 0; j < network.Nodes; j++)
                 {
-                    var x1 = network.x[i][j] * 5;
-                    var x2 = network.x[i+1][j] * 5;
-                    var y1 = network.y[i][j] * 5;
-                    var y2 = network.y[i+1][j] * 5;
+                    var x1 = network.x[i][j] * scl;
+                    var x2 = network.x[i + 1][j] * scl;
+                    var y1 = network.y[i][j] * scl;
+                    var y2 = network.y[i + 1][j] * scl;
 
-                    if (N <= 30)
-                    {
+                    var Grad = (y2 - y1) / (x2 - x1);
+                    var Norm = -1 / Grad;
+                    var angle = Math.Atan(Norm);
 
-                        var Grad = (y2 - y1) / (x2 - x1);
-                        var Norm = -1 / Grad;
-                        var angle = Math.Atan(Norm);
+                    var polyg = new Polygon();
 
-                        var r1 = Radius * (1 - network.hTaper[i][j]) / 1.8;
-                        var r2 = Radius * (1 + network.hTaper[i][j]) / 1.8;
+                    var r1 = Radius * (1 - network.hTaper[i][j]) / 1.8;
+                    var r2 = Radius * (1 + network.hTaper[i][j]) / 1.8;
 
-                        var p11 = new Point((x1 + r1 * Math.Cos(angle)), (y1 + r1 * Math.Sin(angle)));
-                        var p12 = new Point((x1 - r1 * Math.Cos(angle)), (y1 - r1 * Math.Sin(angle)));
-                        var p21 = new Point((x2 + r2 * Math.Cos(angle)), (y2 + r2 * Math.Sin(angle)));
-                        var p22 = new Point((x2 - r2 * Math.Cos(angle)), (y2 - r2 * Math.Sin(angle)));
-
-
-                        GeometryGroup.Children.Add(new LineGeometry(p12, p22));
-                        GeometryGroup.Children.Add(new LineGeometry(p21, p11));
-                    }
-
-                    else
-                    {
-                        GeometryGroup.Children.Add(new LineGeometry(new Point(x1,y1),new Point(x2,y2)));
-                    }
+                    var p11 = new Point((x1 + r1 * Math.Cos(angle)), (y1 + r1 * Math.Sin(angle)));
+                    var p12 = new Point((x1 - r1 * Math.Cos(angle)), (y1 - r1 * Math.Sin(angle)));
+                    var p21 = new Point((x2 + r2 * Math.Cos(angle)), (y2 + r2 * Math.Sin(angle)));
+                    var p22 = new Point((x2 - r2 * Math.Cos(angle)), (y2 - r2 * Math.Sin(angle)));
+                    polyg.Points = new PointCollection() { p11, p12, p22, p21 };
+                    polyg.Fill = new SolidColorBrush(Colors.CornflowerBlue);
+                    polyg.ToolTip = network.hFlow[i][j];
+                    mycanvas.Children.Add(polyg);
                 }
             }
 
             //Vertical Lines
             for (int i = 0; i < network.Nodes; i++)
             {
-                for (int j = 0; j < network.Nodes-1; j++)
+                for (int j = 0; j < network.Nodes - 1; j++)
                 {
-                    var x1 = network.x[i][j] * 5;
-                    var x2 = network.x[i][j + 1] * 5;
-                    var y1 = network.y[i][j] * 5;
-                    var y2 = network.y[i][j + 1] * 5;
+                    var x1 = network.x[i][j] * scl;
+                    var x2 = network.x[i][j + 1] * scl;
+                    var y1 = network.y[i][j] * scl;
+                    var y2 = network.y[i][j + 1] * scl;
 
-                    if (N <= 30)
-                    {
-                        var Grad = (y2 - y1) / (x2 - x1);
-                        var Norm = -1 / Grad;
-                        var angle = Math.Atan(Norm);
+                    var Grad = (y2 - y1) / (x2 - x1);
+                    var Norm = -1 / Grad;
+                    var angle = Math.Atan(Norm);
+                    var polyg = new Polygon();
 
-                        var r1 = Radius * (1 - network.vTaper[i][j]) / 1.8;
-                        var r2 = Radius * (1 + network.vTaper[i][j]) / 1.8;
+                    var r1 = Radius * (1 - network.vTaper[i][j]) / 1.8;
+                    var r2 = Radius * (1 + network.vTaper[i][j]) / 1.8;
 
-                        var p11 = new Point((x1 + r1 * Math.Cos(angle)), (y1 + r1 * Math.Sin(angle)));
-                        var p12 = new Point((x1 - r1 * Math.Cos(angle)), (y1 - r1 * Math.Sin(angle)));
-                        var p21 = new Point((x2 + r2 * Math.Cos(angle)), (y2 + r2 * Math.Sin(angle)));
-                        var p22 = new Point((x2 - r2 * Math.Cos(angle)), (y2 - r2 * Math.Sin(angle)));
+                    var p11 = new Point((x1 + r1 * Math.Cos(angle)), (y1 + r1 * Math.Sin(angle)));
+                    var p12 = new Point((x1 - r1 * Math.Cos(angle)), (y1 - r1 * Math.Sin(angle)));
+                    var p21 = new Point((x2 + r2 * Math.Cos(angle)), (y2 + r2 * Math.Sin(angle)));
+                    var p22 = new Point((x2 - r2 * Math.Cos(angle)), (y2 - r2 * Math.Sin(angle)));
 
-                        GeometryGroup.Children.Add(new LineGeometry(p11, p12));
-                        GeometryGroup.Children.Add(new LineGeometry(p12, p22));
-                        GeometryGroup.Children.Add(new LineGeometry(p22, p21));
-                        GeometryGroup.Children.Add(new LineGeometry(p21, p11));
-                    }
-                    else
-                    {
-                        GeometryGroup.Children.Add(new LineGeometry(new Point(x1,y1),new Point(x2,y2)));
-                    }
+                    polyg.Points = new PointCollection() { p11, p12, p22, p21 };
+                    polyg.Fill = new SolidColorBrush(Colors.CornflowerBlue);
+                    polyg.ToolTip = network.vFlow[i][j];
+
+                    mycanvas.Children.Add(polyg);
+                }
+            }
+
+            for (int i = 0; i < network.Nodes; i++)
+            {
+                for (int j = 0; j < network.Nodes; j++)
+                {
+                    var ellipse = new Ellipse();
+                    ellipse.Width = Radius * 2;
+                    ellipse.Height = Radius * 2;
+                    ellipse.Fill = new SolidColorBrush(Colors.Black);
+
+                    Canvas.SetLeft(ellipse, network.x[i][j] * scl - Radius);
+                    Canvas.SetTop(ellipse, (network.y[i][j]) * scl - Radius);
+                    mycanvas.Children.Add(ellipse);
                 }
             }
 

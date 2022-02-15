@@ -20,21 +20,27 @@
         </Grid.RowDefinitions>
 
         <GridSplitter Width="5" VerticalAlignment="Bottom"/>
-        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
-            <Button Grid.Column="0" Content="Set" Height="50" Click="ButtonBase_OnClick"/>
-            <TextBox Grid.Column="0" Grid.Row="0" Height="25" Background="GhostWhite" x:Name="DisplaceText" 
-                     Text="100"/>
-            <TextBox Grid.Column="0" Grid.Row="0" Height="25" Background="GhostWhite" x:Name="NodesText" 
-                     Text="6"/>
-            <CheckBox x:Name="CheckBox" Content="IsUniform">
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="5,0,0,0">
+            <Button Content="Set" Height="50" Click="ButtonBase_OnClick"/>
+            <TextBlock Text="Displacement"/>
+            <TextBox Background="GhostWhite" x:Name="DisplaceText" Text="100"/>
+            <TextBlock Text="Nodes"/>
+            <TextBox Background="GhostWhite" x:Name="NodesText" Text="6"/>
+            <TextBlock Text="PressureGrad"/>
+            <TextBox Background="GhostWhite" x:Name="PGrad" Text="6"/>
+            <TextBlock Text="PressureAngle"/>
+            <TextBox Background="GhostWhite" x:Name="PAngle" Text="6"/>
 
-            </CheckBox>
+
+            <CheckBox x:Name="CheckBox" Content="IsUniform"/>
+
+
 
         </StackPanel>
         <local:NetworkView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" x:Name="NetworkRegion" Loaded="NetworkView_Loaded">
         </local:NetworkView>
 
-        <StackPanel Grid.Column="0" Grid.Row="1">
+        <StackPanel Grid.Column="0" Grid.Row="1" Margin="5,0,0,0">
             <TextBlock Height="25" x:Name="Name" Text="Name"/>
             <TextBlock Height="22" x:Name="Nodes" Text="Nodes"/>
             <TextBlock Height="22" x:Name="Bingham" Text="Bingham"/>
