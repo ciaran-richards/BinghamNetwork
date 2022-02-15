@@ -7,11 +7,11 @@ using MainSolver;
 
 namespace NetworkDisplay
 {
-    public class API
+    public class WindowAPI
     {
-        public API()
+        public WindowAPI()
         {
-            var ff = new SolverAPI();
+
         }
 
 
