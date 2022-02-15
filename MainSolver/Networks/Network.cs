@@ -226,22 +226,30 @@ namespace MainSolver
             double dy;
             double dx;
 
-            for (int j = 0; j < Nodes; j++) //Horizontal Channels in 
+            // Horizontal Channels
+            for (int i = 0; i < N - 1; i++)
             {
-                dy = y[1][j] - y[0][j];
-                dx = x[1][j] - x[0][j];
-                angleRad = Math.Atan2(dy, dx);
-                HorizFlow += hFlow[0][j] * Math.Cos(angleRad);
-                VertFlow += hFlow[0][j] * Math.Sin(angleRad);
+                for (int j = 0; j < N; j++)
+                {
+                    var deltaX = x[i + 1][j] - x[i][j];
+                    var deltaY = y[i + 1][j] - y[i][j];
+                    angleRad = Math.Atan2(deltaY, deltaX);
+                    HorizFlow += hFlow[i][j] * Math.Cos(angleRad);
+                    VertFlow += hFlow[i][j] * Math.Sin(angleRad);
+                }
             }
 
-            for (int i = 0; i < Nodes; i++) //Vertical Channels in 
+            //Calculate vertical lengths
+            for (int i = 0; i < N; i++)
             {
-                dy = y[i][1] - y[i][0];
-                dx = x[i][1] - x[i][0];
-                angleRad = Math.Atan2(dy, dx);
-                HorizFlow += vFlow[i][0] * Math.Cos(angleRad);
-                VertFlow += vFlow[i][0] * Math.Sin(angleRad);
+                for (int j = 0; j < N - 1; j++)
+                {
+                    var deltaX = x[i][j + 1] - x[i][j];
+                    var deltaY = y[i][j + 1] - y[i][j];
+                    angleRad = Math.Atan2(deltaY, deltaX);
+                    HorizFlow += vFlow[i][j] * Math.Cos(angleRad);
+                    VertFlow += vFlow[i][j] * Math.Sin(angleRad);
+                }
             }
 
             FlowRate = Math.Sqrt(HorizFlow * HorizFlow + VertFlow * VertFlow);

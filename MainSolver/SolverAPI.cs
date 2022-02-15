@@ -18,8 +18,8 @@ namespace MainSolver
             createSet.Length = 100;
 
             var net = CreateNetwork(createSet);
-            net.GradPressure = 300;
-            net.PressAngle = 30*Math.PI/180;
+            net.GradPressure = 0.2;
+            net.PressAngle = 88.2*Math.PI/180;
             var solver = new NewtonianSolver();
             net = solver.Solve(net);
         }
