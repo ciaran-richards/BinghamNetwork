@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
+using MathNet.Numerics.Random;
 
 namespace MainSolver
 {
@@ -72,13 +73,32 @@ namespace MainSolver
                 for (int j = 0; j < N - 1; j++)
                 {
                     {
-                        netSet.dx[i][j] = GenerateDeviation(creatorSett.DisplacementDistro, max_dx, ref randomHelper);
-                        netSet.dy[i][j] = GenerateDeviation(creatorSett.DisplacementDistro, max_dy, ref randomHelper);
-                        
-                        netSet.vTaper[i][j] = GenerateDeviation(creatorSett.TaperDistro, creatorSett.TaperLimit,
-                            ref randomHelper);
-                        netSet.hTaper[i][j] = GenerateDeviation(creatorSett.TaperDistro, creatorSett.TaperLimit,
-                            ref randomHelper);
+                        switch (creatorSett.DisplacementDistro)
+                        {
+                            case Distro.Normal:
+                                netSet.dx[i][j] = RandNormDeviation(max_dx, ref randomHelper);
+                                netSet.dy[i][j] = RandNormDeviation(max_dy, ref randomHelper);
+                                break;
+
+                            case Distro.Uniform:
+                                netSet.dx[i][j] = RandUnifDeviation(max_dx, ref randomHelper);
+                                netSet.dy[i][j] = RandUnifDeviation(max_dy, ref randomHelper);
+                                break;
+
+                        }
+
+                        switch (creatorSett.TaperDistro)
+                        {
+                            case Distro.Normal:
+                                netSet.vTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, ref randomHelper);
+                                netSet.hTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, ref randomHelper);
+                                break;
+
+                            case Distro.Uniform:
+                                netSet.vTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, ref randomHelper);
+                                netSet.hTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, ref randomHelper);
+                                break;
+                        }
 
                     }
                 }
@@ -102,15 +122,24 @@ namespace MainSolver
             return network;
         }
 
-        private double GenerateDeviation(Distro distro, double maximum, ref Random ran)
+        private double RandUnifDeviation(double maximum, ref Random ran)
         {
             var dxRan = ran.NextDouble();
+            double sign = ran.NextBoolean() ? 1:-1;
+            return dxRan * maximum * sign;
+        }
+
+        private double RandNormDeviation(double maximum, ref Random ran)
+        {
+            //Generate a random deviation from mean in a Normal (Gaussian) Distribution
+
+            var dxRan = ran.NextDouble();
             //The discretised normal distribution has a range of 0.00003 to 0.99997, random number be between.
-            bool debug = ((dxRan<(1-MAXCUPROB))||(dxRan > MAXCUPROB));
-            while (debug)
+            bool isOutRange = ((dxRan<(1-MAXCUPROB))||(dxRan > MAXCUPROB));
+            while (isOutRange)
             {
                 dxRan = ran.NextDouble();
-                debug = ((dxRan < (1 - MAXCUPROB)) || (dxRan > MAXCUPROB));
+                isOutRange = ((dxRan < (1 - MAXCUPROB)) || (dxRan > MAXCUPROB));
 
             }
             var xnegetive = false;

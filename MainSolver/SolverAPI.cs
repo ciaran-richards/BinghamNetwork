@@ -11,31 +11,19 @@ namespace MainSolver
         public SolverAPI()
         {
             var createSet = new CreatorSettings();
-            createSet.Nodes = 20;
+            createSet.Nodes = 9;
             createSet.TaperLimit = 0;
-            createSet.DisplacementDistro = Distro.Normal;
+            createSet.DisplacementDistro = Distro.Uniform;
             createSet.DisplacementLimit = 1;
             createSet.Length = 100;
 
             var net = CreateNetwork(createSet);
+            net.GradPressure = 0.2;
+            net.PressAngle = 88.2*Math.PI/180;
             var solver = new NewtonianSolver();
             net = solver.Solve(net);
         }
 
-        private static void Main()
-        {
-            var createSet = new CreatorSettings();
-            createSet.Nodes = 5;
-            createSet.TaperLimit = 0;
-            createSet.DisplacementDistro = Distro.Normal;
-            createSet.DisplacementLimit = 1;
-            createSet.Length = 100;
-
-            var api = new SolverAPI();
-            var net = api.CreateNetwork(createSet);
-            var solver = new NewtonianSolver();
-            net = solver.Solve(net);
-        }
         public Network CreateNetwork(CreatorSettings createSett)
         {
             var networkCreator = new NetworkCreator();

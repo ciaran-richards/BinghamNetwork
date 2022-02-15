@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra;
@@ -11,10 +10,11 @@ namespace MainSolver
     {
         public Network Solve(Network net)
         {
-            double H = 10;
-            double V = 20;
+            double H = net.GradPressure * Math.Cos(net.PressAngle);
+            double V = net.GradPressure * Math.Sin(net.PressAngle);
 
             var pVector = PressureVector(net);
+            
             int N = net.Nodes;
             int M = (N - 1) * (N - 1) - 1; //Matrix + Vector Dimension
             int u;
@@ -41,33 +41,29 @@ namespace MainSolver
             {
                 for (int j = 0; j < N; j++)
                 {
-                    net.hFlow[i][j] = (net.pressure[i + 1][j] - net.pressure[i][j]) * net.inv_hLength[i][j];
+                    net.hFlow[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * net.inv_hLength[i][j];
                 }
             } 
-            //Calculate vertical lengths
+            //Calculate vertical flow
             for (int i = 0; i < N; i++)
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    net.vFlow[i][j] = (net.pressure[i][j+1] - net.pressure[i][j]) * net.inv_vLength[i][j];
+                    net.vFlow[i][j] = -(net.pressure[i][j+1] - net.pressure[i][j]) * net.inv_vLength[i][j];
                 }
             }
+            
+            net.CalculateResiduals();
+            net.CalculateBulkFlow();
 
-            for (int i = 1; i < N - 1; i++)
-            {
-                for (int j = 1; j < N - 1; j++)
-                {
-                    net.residual[i][j] = net.hFlow[i - 1][j] - net.hFlow[i][j] + net.vFlow[i][j - 1] - net.vFlow[i][j];
-                }
-            }
-
-            double AVE_ERROR = net.residual.Average(x => x.Average());
-            double MAX_ERROR = net.residual.Max(x => x.Max());
+            var Bulk = net.FlowRate;
+            var FlAng = net.FlowAngle*180/Math.PI;
+            var PressAngle = Math.Atan(V / H)*180/Math.PI;
 
             return net;
         }
 
-        public Vector<double> PressureVector(Network net)
+        Vector<double> PressureVector(Network net)
         {
             int N = net.Nodes;
             int M = (N - 1) * (N - 1) - 1; //Matrix + Vector Dimension
@@ -76,8 +72,7 @@ namespace MainSolver
             //With Matrix A and vectors X, B and C, of dimension N
             //Scalar v and h being the pressure components.
 
-            var A = new SparseMatrix(M);
-            var P = new DenseVector(M);
+            SparseMatrix A;
             var B = new DenseVector(M);
             var C = new DenseVector(M);
             int u;
@@ -157,17 +152,17 @@ namespace MainSolver
                 }
             }
             A = SparseMatrix.OfRowArrays(rowArrays);
+            
             //Only compute top half.
             var lowerAT = A.Transpose().StrictlyLowerTriangle();
             A = (SparseMatrix)A.Add(lowerAT);
-            int JHG = 0;
 
-            double H = 10;
-            double V = 20;
+            double H = net.GradPressure * Math.Cos(net.PressAngle);
+            double V = net.GradPressure * Math.Sin(net.PressAngle);
 
-            var PressureVec = A.Inverse().Multiply(H * B + V * C);
+            var pressureVec = A.Inverse().Multiply(H * B + V * C);
 
-            return PressureVec;
+            return pressureVec;
         }
 
     }

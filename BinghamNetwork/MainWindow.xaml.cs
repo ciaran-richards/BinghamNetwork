@@ -1,19 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 using MainSolver;
 
 namespace NetworkDisplay
@@ -23,11 +10,11 @@ namespace NetworkDisplay
     /// </summary>
     public partial class MainWindow : Window
     {
-        API API;
+        private SolverAPI solverApi;
         public MainWindow()
         {
             InitializeComponent();
-            API = new API();
+            solverApi = new SolverAPI();
         }
 
         private void NetworkView_Loaded(object sender, RoutedEventArgs e)
@@ -66,11 +53,22 @@ namespace NetworkDisplay
             
             sett.Name = "Hi";
             sett.Nodes = nods;
-            sett.DisplacementDistro = Distro.Normal;
-            sett.TaperDistro = Distro.Normal;
+            sett.DisplacementDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal;
+            sett.TaperDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal; 
             sett.Length = 100;
             sett.DisplacementLimit = displacePerc;
             sett.TaperLimit = 1;
+
+            var net = solverApi.CreateNetwork(sett);
+            NetworkRegion.DrawNetwork(net);
+
+            Name.Text = "Name: " + net.Name;
+            Bingham.Text = "Bingham: " + net.Bingham;
+            Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes*net.Nodes);
+            FlowRate.Text = "FlowRate: " + net.FlowRate;
+            FlowAngle.Text = "FlowAngle: " + net.FlowAngle*180/Math.PI + " deg";
+            PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
+            PressureAngle.Text = "Pressure Angle: " + net.PressAngle*180/Math.PI + " deg";
 
 
         }

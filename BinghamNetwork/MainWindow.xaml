@@ -26,9 +26,24 @@
                      Text="100"/>
             <TextBox Grid.Column="0" Grid.Row="0" Height="25" Background="GhostWhite" x:Name="NodesText" 
                      Text="6"/>
+            <CheckBox x:Name="CheckBox" Content="IsUniform">
+
+            </CheckBox>
+
         </StackPanel>
         <local:NetworkView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" x:Name="NetworkRegion" Loaded="NetworkView_Loaded">
-
         </local:NetworkView>
+
+        <StackPanel Grid.Column="0" Grid.Row="1">
+            <TextBlock Height="25" x:Name="Name" Text="Name"/>
+            <TextBlock Height="22" x:Name="Nodes" Text="Nodes"/>
+            <TextBlock Height="22" x:Name="Bingham" Text="Bingham"/>
+            <TextBlock Height="22" x:Name="PressureGrad" Text="PressureGrad"/>
+            <TextBlock Height="22" x:Name="PressureAngle" Text="PressureAngle"/>
+            <TextBlock Height="22" x:Name="FlowRate" Text="FlowRate"/>
+            <TextBlock Height="22" x:Name="FlowAngle" Text="FlowAngle"/>
+        </StackPanel>
+
+
     </Grid>
 </Window>

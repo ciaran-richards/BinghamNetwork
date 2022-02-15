@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,15 +9,47 @@ namespace MainSolver
     {
         //Network Properties
 
+        private double bingham;
+        private double gradPressure;
+        private double pressAngle;
         public string Name { get; set; }
         public int Nodes { get; private set; } //
         public double Length { get; private set; } //
-        public  double Bingham { get; private set; } //
-        public double GradPressure { get; private set; }//
-        public double GPresAngle { get; private set; }//
-        public double FlowRate { get; set; }
-        public double FlowAngle { get; set; }
 
+        public double Bingham
+        {
+            get { return bingham;}
+            set
+            {
+                bingham = value;
+                ResetVariables();
+            }
+        }
+
+        public double GradPressure
+        {
+            get { return gradPressure; }
+            set
+            {
+                gradPressure = value;
+                ResetVariables();
+            }
+        }//
+
+
+        public double PressAngle
+        {
+            get { return pressAngle; }
+            set
+            {
+                pressAngle = value;
+                ResetVariables();
+            }
+        }//
+        public double FlowRate { get; private set; }
+        public double FlowAngle { get; private set; }
+        public double MaxResidual { get; private set; }
+        public double AveResidual { get; private set; }
 
         //Node Properties
         public double[][] x { get; private set; }
@@ -50,47 +81,16 @@ namespace MainSolver
             Name = sett.Name;
             Nodes = sett.Nodes;
             var N = Nodes;
-            Bingham = sett.Bingham;
             Length = sett.Length;
             dx = sett.dx;
             dy = sett.dy;
             hTaper = sett.hTaper;
             vTaper = sett.vTaper;
 
-            // Set Dimensions of template and assign to all fields
-            x = new double[N][];
-            y = new double[N][];
-            hLength = new double[N-1][]; 
-            vLength = new double[N][];
-            inv_hLength = new double[N - 1][];
-            inv_vLength = new double[N][];
-            pressure = new double[N][]; 
-            residual = new double[N][];
-            hFlow = new double[N-1][];
-            vFlow = new double[N][];
-            h_dP = new double[N-1][];
-            v_dP = new double[N][];
+            //Initialise all fields and set to zero;
+            InitialiseFields();
 
-            for (int i = 0; i <=N-1; i++)
-            {
-                x[i] = new double[N];
-                y[i] = new double[N];
-                pressure[i] = new double[N];
-                residual[i] = new double[N];
-                vLength[i] = new double[N-1];
-                inv_vLength[i] = new double[N - 1];
-                vFlow[i] = new double[N-1];
-                v_dP[i] = new double[N-1];
-
-                if (i<N-1)
-                {
-                    hLength[i] = new double[N];
-                    inv_hLength[i] = new double[N];
-                    hFlow[i]= new double[N];
-                    h_dP[i] = new double[N];
-                }
-
-            }
+            Bingham = sett.Bingham;
 
             double invn1 = 1 / ((double)N - 1);
             
@@ -128,6 +128,132 @@ namespace MainSolver
                 }
             }
 
+        }
+
+        private void InitialiseFields()
+        {
+            var N = Nodes;
+            x = new double[N][];
+            y = new double[N][];
+            hLength = new double[N - 1][];
+            vLength = new double[N][];
+            inv_hLength = new double[N - 1][];
+            inv_vLength = new double[N][];
+            pressure = new double[N][];
+            residual = new double[N][];
+            hFlow = new double[N - 1][];
+            vFlow = new double[N][];
+            h_dP = new double[N - 1][];
+            v_dP = new double[N][];
+
+            for (int i = 0; i <= N - 1; i++)
+            {
+                x[i] = new double[N];
+                y[i] = new double[N];
+                vLength[i] = new double[N - 1];
+                inv_vLength[i] = new double[N - 1];
+                if (i < N - 1)
+                {
+                    hLength[i] = new double[N];
+                    inv_hLength[i] = new double[N];
+                }
+            }
+
+            ResetVariables();
+        }
+
+        void ResetVariables()
+        {
+            AveResidual = 0;
+            MaxResidual = 0;
+            FlowRate = 0;
+            FlowAngle = 0;
+            var N = Nodes;
+            for (int i = 0; i <= N - 1; i++)
+            {
+                pressure[i] = new double[N];
+                residual[i] = new double[N];
+                vFlow[i] = new double[N - 1];
+                v_dP[i] = new double[N - 1];
+
+                if (i < N - 1)
+                {
+                    hFlow[i] = new double[N];
+                    h_dP[i] = new double[N];
+                }
+            }
+        }
+
+        public void CalculateResiduals()
+        {
+            int N = Nodes;
+            for (int i = 1; i < N - 1; i++)
+            {
+                for (int j = 1; j < N - 1; j++)
+                {
+                    residual[i][j] = hFlow[i - 1][j] - hFlow[i][j] + vFlow[i][j - 1] - vFlow[i][j];
+                }
+            }
+
+            for (int i = 1; i < N - 1; i++)
+            {
+                residual[i][0] = hFlow[i - 1][0] - hFlow[i][0] + vFlow[i][N - 2] - vFlow[i][0];
+                residual[i][N - 1] = hFlow[i - 1][N - 1] - hFlow[i][N - 1] + vFlow[i][N - 2] - vFlow[i][0];
+            }
+
+            for (int j = 1; j < N - 1; j++)
+            {
+                residual[0][j] = hFlow[N - 2][j] - hFlow[0][j] + vFlow[0][j - 1] - vFlow[0][j];
+                residual[N - 1][j] = hFlow[N - 2][j] - hFlow[0][j] + vFlow[N - 1][j - 1] - vFlow[N - 1][j];
+            }
+
+            residual[0][0] = hFlow[N - 2][0] - hFlow[0][0] + vFlow[0][N - 2] - vFlow[0][0]; //BL
+            residual[N - 1][0] = hFlow[N - 2][0] - hFlow[0][0] + vFlow[N - 1][N - 2] - vFlow[N - 1][0]; //BR
+            residual[0][N - 1] = hFlow[N - 2][N - 1] - hFlow[0][N - 1] + vFlow[0][N - 2] - vFlow[0][0]; //TL
+            residual[N - 1][N - 1] = hFlow[N - 2][N - 1] - hFlow[0][N - 1] + vFlow[N - 1][N - 2] - vFlow[N - 1][0]; //BR
+
+            AveResidual = residual.Average(x => x.Average());
+            MaxResidual = residual.Max(x => x.Max());
+
+        }
+
+        public void CalculateBulkFlow()
+        {
+            var N = Nodes;
+            double VertFlow = 0;
+            double HorizFlow = 0;
+            double angleRad;
+            double dy;
+            double dx;
+
+            // Horizontal Channels
+            for (int i = 0; i < N - 1; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    var deltaX = x[i + 1][j] - x[i][j];
+                    var deltaY = y[i + 1][j] - y[i][j];
+                    angleRad = Math.Atan2(deltaY, deltaX);
+                    HorizFlow += hFlow[i][j] * Math.Cos(angleRad);
+                    VertFlow += hFlow[i][j] * Math.Sin(angleRad);
+                }
+            }
+
+            //Calculate vertical lengths
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N - 1; j++)
+                {
+                    var deltaX = x[i][j + 1] - x[i][j];
+                    var deltaY = y[i][j + 1] - y[i][j];
+                    angleRad = Math.Atan2(deltaY, deltaX);
+                    HorizFlow += vFlow[i][j] * Math.Cos(angleRad);
+                    VertFlow += vFlow[i][j] * Math.Sin(angleRad);
+                }
+            }
+
+            FlowRate = Math.Sqrt(HorizFlow * HorizFlow + VertFlow * VertFlow);
+            FlowAngle = Math.Atan(VertFlow/HorizFlow);
         }
 
     }
