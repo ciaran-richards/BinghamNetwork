@@ -30,11 +30,7 @@
             <TextBox Background="GhostWhite" x:Name="PGrad" Text="6"/>
             <TextBlock Text="PressureAngle"/>
             <TextBox Background="GhostWhite" x:Name="PAngle" Text="6"/>
-
-
             <CheckBox x:Name="CheckBox" Content="IsUniform"/>
-
-
 
         </StackPanel>
         <local:NetworkView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" x:Name="NetworkRegion" Loaded="NetworkView_Loaded">
@@ -48,6 +44,9 @@
             <TextBlock Height="22" x:Name="PressureAngle" Text="PressureAngle"/>
             <TextBlock Height="22" x:Name="FlowRate" Text="FlowRate"/>
             <TextBlock Height="22" x:Name="FlowAngle" Text="FlowAngle"/>
+            <TextBlock Height="22" x:Name="MaxRes" Text="Max Residual"/>
+
+
         </StackPanel>
 
 

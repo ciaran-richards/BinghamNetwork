@@ -80,6 +80,7 @@ namespace NetworkDisplay
             FlowAngle.Text = "FlowAngle: " + net.FlowAngle*180/Math.PI + " deg";
             PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
             PressureAngle.Text = "Pressure Angle: " + net.PressAngle*180/Math.PI + " deg";
+            MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
         }
     }
 }
