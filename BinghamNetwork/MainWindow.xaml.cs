@@ -58,8 +58,19 @@ namespace NetworkDisplay
             sett.Length = 100;
             sett.DisplacementLimit = displacePerc;
             sett.TaperLimit = 1;
-
+            
             var net = solverApi.CreateNetwork(sett);
+
+            try
+            {
+                net.GradPressure = double.Parse(PGrad.Text);
+                net.PressAngle = double.Parse(PAngle.Text)*Math.PI/180;
+            }
+            catch(Exception exception)
+            {}
+            var newtonSolver = new NewtonianSolver();
+            net = newtonSolver.Solve(net);
+
             NetworkRegion.DrawNetwork(net);
 
             Name.Text = "Name: " + net.Name;
@@ -69,8 +80,7 @@ namespace NetworkDisplay
             FlowAngle.Text = "FlowAngle: " + net.FlowAngle*180/Math.PI + " deg";
             PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
             PressureAngle.Text = "Pressure Angle: " + net.PressAngle*180/Math.PI + " deg";
-
-
+            MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
         }
     }
 }
