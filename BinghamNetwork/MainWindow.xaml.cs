@@ -55,7 +55,7 @@ namespace NetworkDisplay
             sett.Nodes = nods;
             sett.DisplacementDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal;
             sett.TaperDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal; 
-            sett.Length = 100;
+            sett.Length = 1;
             sett.DisplacementLimit = displacePerc;
             sett.TaperLimit = 1;
             
@@ -74,7 +74,7 @@ namespace NetworkDisplay
             NetworkRegion.DrawNetwork(net);
 
             Name.Text = "Name: " + net.Name;
-            Bingham.Text = "Bingham: " + net.Bingham;
+            Bingham.Text = "Yield: " + net.YieldPressure;
             Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes*net.Nodes);
             FlowRate.Text = "FlowRate: " + net.FlowRate;
             FlowAngle.Text = "FlowAngle: " + net.FlowAngle*180/Math.PI + " deg";
