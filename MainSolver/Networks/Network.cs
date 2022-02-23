@@ -218,8 +218,8 @@ namespace MainSolver
             residual[0][N - 1] = hFlow[N - 2][N - 1] - hFlow[0][N - 1] + vFlow[0][N - 2] - vFlow[0][0]; //TL
             residual[N - 1][N - 1] = hFlow[N - 2][N - 1] - hFlow[0][N - 1] + vFlow[N - 1][N - 2] - vFlow[N - 1][0]; //BR
 
-            AveResidual = residual.Average(x => x.Average());
-            MaxResidual = residual.Max(x => x.Max());
+            AveResidual = residual.Average(x => x.Average(y=> Math.Abs(y)));
+            MaxResidual = residual.Max(x => x.Max(y => Math.Abs(y)));
 
         }
 

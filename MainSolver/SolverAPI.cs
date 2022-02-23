@@ -12,10 +12,10 @@ namespace MainSolver
         public SolverAPI()
         {
             var createSet = new CreatorSettings();
-            createSet.Nodes = 4;
+            createSet.Nodes = 5;
             createSet.TaperLimit = 0;
             createSet.DisplacementDistro = Distro.Uniform;
-            createSet.DisplacementLimit = 1;
+            createSet.DisplacementLimit = 0.5;
             createSet.Length = 100;
 
             var net = CreateNetwork(createSet);
