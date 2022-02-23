@@ -12,16 +12,16 @@ namespace MainSolver
         public SolverAPI()
         {
             var createSet = new CreatorSettings();
-            createSet.Nodes = 5;
+            createSet.Nodes = 15;
             createSet.TaperLimit = 0;
             createSet.DisplacementDistro = Distro.Uniform;
-            createSet.DisplacementLimit = 0.5;
-            createSet.Length = 100;
+            createSet.DisplacementLimit = 1;
+            createSet.Length = 1;
 
             var net = CreateNetwork(createSet);
-            net.GradPressure = 4;
+            net.GradPressure = 60;
             net.PressAngle = 88.2*Math.PI/180;
-            net.YieldPressure = 0.3;
+            net.YieldPressure = 10;
             var solver = new UniformBinghamSolver();
             net = solver.Solve(net);
         }

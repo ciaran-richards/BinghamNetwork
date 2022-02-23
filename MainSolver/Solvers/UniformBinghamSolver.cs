@@ -68,7 +68,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
-                    bGrad[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * net.inv_hLength[i][j] * net.Inv_Yield; //*0.5;
+                    bGrad[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) *0.5 * net.inv_hLength[i][j] * net.Inv_Yield;
                 }
             }
 
@@ -84,7 +84,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    bGrad[i][j] = -(net.pressure[i][j + 1] - net.pressure[i][j]) * net.inv_vLength[i][j] * net.Inv_Yield; //*0.5;
+                    bGrad[i][j] = -(net.pressure[i][j + 1] - net.pressure[i][j]) * 0.5 * net.inv_vLength[i][j] * net.Inv_Yield; 
                 }
             }
             return bGrad;
@@ -201,7 +201,7 @@ namespace MainSolver.Solvers
             int u;
             var invYi = net.Inv_Yield;
             double diag;
-
+            var yield = net.YieldPressure;
             //Calculate the Jacobian Matrix
             //Different order to Newtonian Matrix
             //Calculate row-by-row the top-right side of the matrix, but without the diagonals
@@ -222,27 +222,27 @@ namespace MainSolver.Solvers
                         if (p < N - 2)
                         {
                             //Derivative wrt RH node Pressure - Except Right Bound
-                            row[u + 1] = FlowDerivative(hB[p][q]) * net.inv_hLength[p][q] * invYi; //*0.5;
+                            row[u + 1] = FlowDerivative(hB[p][q]) * net.inv_hLength[p][q] * 2 * yield; //*0.5;
                             //row[u + 1] = net.inv_hLength[p][q];
                         }
                         
                         if (p == 0 && q > 0)
                         {
                             //Derivative wrt RH node Pressure - Right Bound
-                            row[u + (N - 2)] = FlowDerivative(hB[N - 2][q]) * net.inv_hLength[N - 2][q] * invYi; //*0.5;
+                            row[u + (N - 2)] = FlowDerivative(hB[N - 2][q]) * net.inv_hLength[N - 2][q] * 2 * yield; //*0.5;
                             //row[u + (N - 2)] = net.inv_hLength[N - 2][q];
                         }
 
                         if (u + N - 1 < M)
                         {  //Derivative wrt Upper node Pressure - Except Top Bound
-                            row[u + N - 1] = FlowDerivative(vB[p][q]) * net.inv_vLength[p][q] * invYi; //*0.5;
+                            row[u + N - 1] = FlowDerivative(vB[p][q]) * net.inv_vLength[p][q] * 2 * yield; //*0.5;
                             //row[u + N - 1] = net.inv_vLength[p][q];
                         }
 
                         if (u + (N - 2) * (N - 1) < M)
                         {
                             //Derivative wrt top node pressure on it's column - Bottom Bound only
-                            row[u + (N - 2) * (N - 1)] = FlowDerivative(vB[p][N - 2]) * net.inv_vLength[p][N - 2]; //*0.5; //Bottom
+                            row[u + (N - 2) * (N - 1)] = FlowDerivative(vB[p][N - 2]) * net.inv_vLength[p][N - 2] * 2 * yield; //*0.5; //Bottom
                             //row[u + (N - 2) * (N - 1)] = net.inv_vLength[p][N - 2];
                         }
                         rowArrays[u] = row;
@@ -261,11 +261,11 @@ namespace MainSolver.Solvers
             }
 
             //Add boundary conditions four diagonal terms
-            Jacobian[0,0] = Jacobian[0,0] - FlowDerivative(hB[0][0] * net.inv_hLength[0][0] * invYi); //*0.5; //1,0
-            Jacobian[N-2, N-2] = Jacobian[N-2, N-2] - FlowDerivative(vB[0][0] * net.inv_vLength[0][0] * invYi);//*0.5; //0,1
-            Jacobian[N-3, N-3] = Jacobian[N-3, N-3] - FlowDerivative(hB[N-2][0] * net.inv_hLength[N-2][0] * invYi);//*0.5; //N-2,0
+            Jacobian[0, 0] = Jacobian[0, 0] - FlowDerivative(hB[0][0]) * net.inv_hLength[0][0] * 2 * yield;
+            Jacobian[N-2, N-2] = Jacobian[N-2, N-2] - FlowDerivative(vB[0][0]) * net.inv_vLength[0][0] * 2 * yield;
+            Jacobian[N-3, N-3] = Jacobian[N-3, N-3] - FlowDerivative(hB[N-2][0]) * net.inv_hLength[N-2][0] * 2 * yield;
             u = (N - 1) * (N - 2) - 1;
-            Jacobian[u,u] = Jacobian[u,u] - FlowDerivative(vB[0][N-2] * net.inv_vLength[0][N-2] * invYi);//*0.5; //0,N-2
+            Jacobian[u,u] = Jacobian[u,u] - FlowDerivative(vB[0][N-2]) * net.inv_vLength[0][N-2] * 2 * yield;
 
 
 
@@ -291,8 +291,6 @@ namespace MainSolver.Solvers
         {
             int u;
             var N = net.Nodes;
-
-            correction = (DenseVector)correction.Multiply(0.8);
 
             double H = net.GradPressure * Math.Cos(net.PressAngle) * net.Length;
             double V = net.GradPressure * Math.Sin(net.PressAngle) * net.Length;
