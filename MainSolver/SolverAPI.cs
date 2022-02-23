@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MainSolver.Solvers;
 
 namespace MainSolver
 {
@@ -11,16 +12,17 @@ namespace MainSolver
         public SolverAPI()
         {
             var createSet = new CreatorSettings();
-            createSet.Nodes = 9;
+            createSet.Nodes = 15;
             createSet.TaperLimit = 0;
             createSet.DisplacementDistro = Distro.Uniform;
             createSet.DisplacementLimit = 1;
-            createSet.Length = 100;
+            createSet.Length = 1;
 
             var net = CreateNetwork(createSet);
-            net.GradPressure = 0.2;
+            net.GradPressure = 60;
             net.PressAngle = 88.2*Math.PI/180;
-            var solver = new NewtonianSolver();
+            net.YieldPressure = 10;
+            var solver = new UniformBinghamSolver();
             net = solver.Solve(net);
         }
 

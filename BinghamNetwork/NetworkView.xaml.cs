@@ -34,15 +34,15 @@ namespace NetworkDisplay
         {
             var N = network.Nodes;
             var RadiusSize = 25;
-            var margin = 10;
+            var margin = 20;
             var max = mycanvas.ActualHeight - (2*RadiusSize+margin)/(double)N;
             scl = max / network.Length;
             scl = scl * N / (N + 1);
 
-            double Radius = RadiusSize * scl / N;
-            double scaleMargin = (RadiusSize + margin) * scl / N;
+            double Radius = RadiusSize / N;
+            double scaleMargin = (RadiusSize) / N;
 
-            var translate = scaleMargin + network.Length * scl / (2 * (N - 1));
+            var translate = scaleMargin + max / (2 * (N - 1));
 
             
             var maxhFlow = network.hFlow.Max(x => x.Max(Math.Abs));

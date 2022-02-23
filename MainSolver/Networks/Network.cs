@@ -9,22 +9,27 @@ namespace MainSolver
     {
         //Network Properties
 
-        private double bingham;
+        private double yieldPressure = 1;
+        private double inv_yieldPressure = 1;
         private double gradPressure;
         private double pressAngle;
+
         public string Name { get; set; }
         public int Nodes { get; private set; } //
         public double Length { get; private set; } //
 
-        public double Bingham
+        public double YieldPressure
         {
-            get { return bingham;}
+            get { return yieldPressure;}
             set
             {
-                bingham = value;
+                yieldPressure = value;
+                inv_yieldPressure = 1 / value;
                 ResetVariables();
             }
         }
+
+        public double Inv_Yield { get {return inv_yieldPressure;} private set {} }
 
         public double GradPressure
         {
@@ -90,7 +95,8 @@ namespace MainSolver
             //Initialise all fields and set to zero;
             InitialiseFields();
 
-            Bingham = sett.Bingham;
+            yieldPressure = sett.Bingham;
+            inv_yieldPressure = 1 / sett.Bingham;
 
             double invn1 = 1 / ((double)N - 1);
             
@@ -212,8 +218,8 @@ namespace MainSolver
             residual[0][N - 1] = hFlow[N - 2][N - 1] - hFlow[0][N - 1] + vFlow[0][N - 2] - vFlow[0][0]; //TL
             residual[N - 1][N - 1] = hFlow[N - 2][N - 1] - hFlow[0][N - 1] + vFlow[N - 1][N - 2] - vFlow[N - 1][0]; //BR
 
-            AveResidual = residual.Average(x => x.Average());
-            MaxResidual = residual.Max(x => x.Max());
+            AveResidual = residual.Average(x => x.Average(y=> Math.Abs(y)));
+            MaxResidual = residual.Max(x => x.Max(y => Math.Abs(y)));
 
         }
 
@@ -239,7 +245,7 @@ namespace MainSolver
                 }
             }
 
-            //Calculate vertical lengths
+            //Vertical Channels
             for (int i = 0; i < N; i++)
             {
                 for (int j = 0; j < N - 1; j++)
@@ -251,7 +257,6 @@ namespace MainSolver
                     VertFlow += vFlow[i][j] * Math.Sin(angleRad);
                 }
             }
-
             FlowRate = Math.Sqrt(HorizFlow * HorizFlow + VertFlow * VertFlow);
             FlowAngle = Math.Atan(VertFlow/HorizFlow);
         }
