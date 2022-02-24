@@ -261,5 +261,10 @@ namespace MainSolver
             FlowAngle = Math.Atan(VertFlow/HorizFlow);
         }
 
+        public Network Copy()
+        {
+            return (Network) this.MemberwiseClone();
+        }
+
     }
 }

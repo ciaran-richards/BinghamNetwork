@@ -15,15 +15,22 @@ namespace MainSolver
             createSet.Nodes = 15;
             createSet.TaperLimit = 0;
             createSet.DisplacementDistro = Distro.Uniform;
-            createSet.DisplacementLimit = 1;
+            createSet.DisplacementLimit = 0;
             createSet.Length = 1;
 
             var net = CreateNetwork(createSet);
-            net.GradPressure = 60;
-            net.PressAngle = 45.2*Math.PI/180;
-            net.YieldPressure =10;
-            var solver = new UniformBinghamSolver();
-            net = solver.Solve(net);
+            //Sigma = 2
+            net.GradPressure = 20;
+            net.PressAngle = 60*Math.PI/180;
+            net.YieldPressure =2;
+            var binghamSolver = new UniformBinghamSolver();
+            var newtonianSolver = new NewtonianSolver();
+            var bing = binghamSolver.Solve(net.Copy());
+            var newt = newtonianSolver.Solve(net.Copy());
+
+            var ratio = bing.FlowRate / newt.FlowRate;
+
+            int y = 9;
         }
 
         public Network CreateNetwork(CreatorSettings createSett)

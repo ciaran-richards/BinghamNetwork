@@ -58,7 +58,7 @@ namespace MainSolver.Solvers
                 ApplyCorrection(ref net, correction);
                 iteration++;
             }
-
+            net.CalculateBulkFlow();
             return net;
         }
 
@@ -124,7 +124,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
-                    net.hFlow[i][j] = FlowRate(hBingham[i][j]);
+                    net.hFlow[i][j] = FlowRate(hBingham[i][j]) * 2 * net.YieldPressure;
                 }
             }
 
@@ -133,7 +133,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    net.vFlow[i][j] = FlowRate(vBingham[i][j]);
+                    net.vFlow[i][j] = FlowRate(vBingham[i][j]) * 2 * net.YieldPressure;
                 }
             }
 
