@@ -20,8 +20,8 @@ namespace MainSolver
 
             var net = CreateNetwork(createSet);
             net.GradPressure = 60;
-            net.PressAngle = 88.2*Math.PI/180;
-            net.YieldPressure = 10;
+            net.PressAngle = 45.2*Math.PI/180;
+            net.YieldPressure =10;
             var solver = new UniformBinghamSolver();
             net = solver.Solve(net);
         }
