@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.Providers.SparseSolver.Mkl;
 
 namespace MainSolver.Solvers
 {
     public class UniformBinghamSolver
     {
+        
         //Regularising Constant for iterative solver  
         private readonly double reg = Math.Pow(10, -5);
 
@@ -16,6 +19,7 @@ namespace MainSolver.Solvers
             double V = net.GradPressure * Math.Sin(net.PressAngle) * net.Length;
             int N = net.Nodes;
             var invN1 = 1d / (net.Nodes-1);
+            Control.UseNativeMKL();
 
             var ran = new Random();
             for (int i = 0; i < N-1; i++)
@@ -54,7 +58,7 @@ namespace MainSolver.Solvers
                 ApplyCorrection(ref net, correction);
                 iteration++;
             }
-
+            net.CalculateBulkFlow();
             return net;
         }
 
@@ -120,7 +124,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
-                    net.hFlow[i][j] = FlowRate(hBingham[i][j]);
+                    net.hFlow[i][j] = FlowRate(hBingham[i][j]) * 2 * net.YieldPressure;
                 }
             }
 
@@ -129,7 +133,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    net.vFlow[i][j] = FlowRate(vBingham[i][j]);
+                    net.vFlow[i][j] = FlowRate(vBingham[i][j]) * 2 * net.YieldPressure;
                 }
             }
 
