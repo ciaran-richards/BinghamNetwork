@@ -81,6 +81,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Solvers\ISolver.cs" />
     <Compile Include="Solvers\NewtonianSolver.cs" />
     <Compile Include="Paths.cs" />
     <Compile Include="Networks\CreatorSettings.cs" />
@@ -102,6 +103,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="SolverAPI.cs" />
+    <Compile Include="Solvers\PostProcessor.cs" />
     <Compile Include="Solvers\UniformBinghamSolver.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -80,7 +80,13 @@ namespace NetworkDisplay
                         polyg.Fill = new SolidColorBrush(backwardFlowColor);
                         polyg.StrokeDashArray = new DoubleCollection() { 2 };
                     }
-                    
+
+                    if (network.hFlow[i][j] == 0)
+                    {
+                        polyg.StrokeDashArray = new DoubleCollection() { 1 };
+                    }
+
+
                     polyg.ToolTip = HorizontalToolTip(network,i,j);
                     polyg.Fill.Opacity = Math.Abs(network.hFlow[i][j] * invMaxFlow);
                     mycanvas.Children.Add(polyg);
@@ -113,6 +119,11 @@ namespace NetworkDisplay
                     {
                         polyg.Fill = new SolidColorBrush(backwardFlowColor);
                         polyg.StrokeDashArray = new DoubleCollection(){2};
+                    }
+
+                    if (network.vFlow[i][j] == 0)
+                    {
+                        polyg.StrokeDashArray = new DoubleCollection() { 1 };
                     }
 
                     polyg.Fill.Opacity = Math.Abs(network.vFlow[i][j] * invMaxFlow);

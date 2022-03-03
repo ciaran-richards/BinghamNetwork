@@ -47,7 +47,7 @@ namespace MainSolver.Solvers
 
 
             //while (correction.Max(x => Math.Abs(x)) / (H + V) > Math.Pow(10, -5))
-            while (net.MaxResidual > Math.Pow(10,-3) || iteration<1)
+            while (net.MaxResidual > Math.Pow(10,-4) || iteration<1)
             {
                 var hb = HBinghamGrad(net);
                 var vb = VBinghamGrad(net);
@@ -59,6 +59,7 @@ namespace MainSolver.Solvers
                 iteration++;
             }
             net.CalculateBulkFlow();
+
             return net;
         }
 
@@ -316,15 +317,5 @@ namespace MainSolver.Solvers
                 net.pressure[k][N - 1] = net.pressure[k][0] - V;
             }
         }
-
-
-        Vector NewPressures; //Pressure Vec 
-
-        //Calculate Flow
-
-        //Check residuals
-
-        //Finally, apply to network object.
-
     }
 }

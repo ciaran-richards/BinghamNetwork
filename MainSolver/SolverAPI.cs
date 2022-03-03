@@ -11,24 +11,24 @@ namespace MainSolver
     {
         public SolverAPI()
         {
-            var createSet = new CreatorSettings();
-            createSet.Nodes = 15;
-            createSet.TaperLimit = 0;
-            createSet.DisplacementDistro = Distro.Uniform;
-            createSet.DisplacementLimit = 0;
-            createSet.Length = 1;
+            //var createSet = new CreatorSettings();
+            //createSet.Nodes = 15;
+            //createSet.TaperLimit = 0;
+            //createSet.DisplacementDistro = Distro.Uniform;
+            //createSet.DisplacementLimit = 0;
+            //createSet.Length = 1;
 
-            var net = CreateNetwork(createSet);
-            //Sigma = 2
-            net.GradPressure = 20;
-            net.PressAngle = 60*Math.PI/180;
-            net.YieldPressure =2;
-            var binghamSolver = new UniformBinghamSolver();
-            var newtonianSolver = new NewtonianSolver();
-            var bing = binghamSolver.Solve(net.Copy());
-            var newt = newtonianSolver.Solve(net.Copy());
+            //var net = CreateNetwork(createSet);
+            ////Sigma = 2
+            //net.GradPressure = 20;
+            //net.PressAngle = 60*Math.PI/180;
+            //net.YieldPressure =2;
+            //var binghamSolver = new UniformBinghamSolver();
+            //var newtonianSolver = new NewtonianSolver();
+            //var bing = binghamSolver.Solve(net.Copy());
+            //var newt = newtonianSolver.Solve(net.Copy());
 
-            var ratio = bing.FlowRate / newt.FlowRate;
+            //var ratio = bing.FlowRate / newt.FlowRate;
 
             int y = 9;
         }
