@@ -25,13 +25,13 @@
             <TextBlock Text="Displacement"/>
             <TextBox Background="GhostWhite" x:Name="DisplaceText" Text="100"/>
             <TextBlock Text="Nodes"/>
-            <TextBox Background="GhostWhite" x:Name="NodesText" Text="6"/>
+            <TextBox Background="GhostWhite" x:Name="NodesText" Text="8"/>
             <TextBlock Text="PressureGrad"/>
-            <TextBox Background="GhostWhite" x:Name="PGrad" Text="6"/>
+            <TextBox Background="GhostWhite" x:Name="PGrad" Text="1.1"/>
             <TextBlock Text="PressureAngle"/>
             <TextBox Background="GhostWhite" x:Name="PAngle" Text="6"/>
             <CheckBox x:Name="CheckBox" Content="IsUniform"/>
-
+            <Button x:Name="CompareButton" Content="Newtonian" Click="ChangeDisplay_OnClick"/>
         </StackPanel>
         <local:NetworkView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" x:Name="NetworkRegion" Loaded="NetworkView_Loaded">
         </local:NetworkView>

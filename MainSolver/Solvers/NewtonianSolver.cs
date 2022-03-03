@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
@@ -14,7 +15,8 @@ namespace MainSolver
             double V = net.GradPressure * Math.Sin(net.PressAngle);
 
             var pVector = PressureVector(net);
-            
+            Control.UseNativeMKL();
+
             int N = net.Nodes;
             int M = (N - 1) * (N - 1) - 1; //Matrix + Vector Dimension
             int u;
@@ -72,7 +74,7 @@ namespace MainSolver
             //With Matrix A and vectors X, B and C, of dimension N
             //Scalar v and h being the pressure components.
 
-            SparseMatrix A;
+            DenseMatrix A;
             var B = new DenseVector(M);
             var C = new DenseVector(M);
             int u;
@@ -151,11 +153,11 @@ namespace MainSolver
                     }
                 }
             }
-            A = SparseMatrix.OfRowArrays(rowArrays);
+            A = DenseMatrix.OfRowArrays(rowArrays);
             
             //Only compute top half.
             var lowerAT = A.Transpose().StrictlyLowerTriangle();
-            A = (SparseMatrix)A.Add(lowerAT);
+            A = (DenseMatrix)A.Add(lowerAT);
 
             double H = net.GradPressure * Math.Cos(net.PressAngle);
             double V = net.GradPressure * Math.Sin(net.PressAngle);

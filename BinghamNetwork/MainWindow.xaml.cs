@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows;
-
+using System.Windows.Media;
 using MainSolver;
+using MainSolver.Solvers;
 
 namespace NetworkDisplay
 {
@@ -11,6 +12,8 @@ namespace NetworkDisplay
     public partial class MainWindow : Window
     {
         private SolverAPI solverApi;
+        private Network selectedNetwork;
+        private bool isNewtonian;
         public MainWindow()
         {
             InitializeComponent();
@@ -60,7 +63,7 @@ namespace NetworkDisplay
             sett.TaperLimit = 1;
             
             var net = solverApi.CreateNetwork(sett);
-
+            net.YieldPressure = 0.5;
             try
             {
                 net.GradPressure = double.Parse(PGrad.Text);
@@ -68,19 +71,59 @@ namespace NetworkDisplay
             }
             catch(Exception exception)
             {}
-            var newtonSolver = new NewtonianSolver();
-            net = newtonSolver.Solve(net);
-
-            NetworkRegion.DrawNetwork(net);
-
-            Name.Text = "Name: " + net.Name;
-            Bingham.Text = "Yield: " + net.YieldPressure;
-            Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes*net.Nodes);
-            FlowRate.Text = "FlowRate: " + net.FlowRate;
-            FlowAngle.Text = "FlowAngle: " + net.FlowAngle*180/Math.PI + " deg";
-            PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
-            PressureAngle.Text = "Pressure Angle: " + net.PressAngle*180/Math.PI + " deg";
-            MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+            selectedNetwork = net;
+           UpdateCanvas();
         }
+
+        private void UpdateCompareButton()
+        {
+            CompareButton.Content = isNewtonian ? "Newtonian" : "Bingham";
+            var colour = isNewtonian ? Colors.LightBlue : Colors.LightGreen;
+            CompareButton.Background = new SolidColorBrush(colour);
+        }
+
+        private void ChangeDisplay_OnClick(object sender, RoutedEventArgs e)
+        {
+            isNewtonian = !isNewtonian;
+            UpdateCompareButton();
+            UpdateCanvas();
+        }
+
+        private void UpdateCanvas()
+        {
+            if (isNewtonian)
+            {
+                var solver = new NewtonianSolver();
+                var net = solver.Solve(selectedNetwork);
+                NetworkRegion.DrawNetwork(net);
+                Name.Text = "Name: " + net.Name;
+                Bingham.Text = "Yield: " + net.YieldPressure;
+                Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
+                FlowRate.Text = "FlowRate: " + net.FlowRate;
+                FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
+                PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
+                PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
+                MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+            }
+            else
+            {
+                var solver = new UniformBinghamSolver();
+                var postProcessor = new PostProcessor();
+                var net = solver.Solve(selectedNetwork);
+                net = postProcessor.PostProcess(net);
+                NetworkRegion.DrawNetwork(net);
+                Name.Text = "Name: " + net.Name;
+                Bingham.Text = "Yield: " + net.YieldPressure;
+                Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
+                FlowRate.Text = "FlowRate: " + net.FlowRate;
+                FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
+                PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
+                PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
+                MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+            }
+
+        }
+
+
     }
 }
