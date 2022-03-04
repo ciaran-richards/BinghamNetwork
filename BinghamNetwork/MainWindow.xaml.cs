@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using MainSolver;
 using MainSolver.Solvers;
@@ -125,5 +126,11 @@ namespace NetworkDisplay
         }
 
 
+        private void NetworkRegion_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            selectedNetwork.GradPressure += 0.025 *(double)e.Delta/120d;
+            PGrad.Text = Math.Round(selectedNetwork.GradPressure,5).ToString();
+            UpdateCanvas();
+        }
     }
 }

@@ -42,7 +42,8 @@ namespace MainSolver.Solvers
             var resVec = new DenseVector((N-1)*(N-1)-1);
             var correction = new DenseVector((N - 1) * (N - 1) - 1);
             correction = (DenseVector)resVec.Add(1000);
-            
+            var euclidNorm = 0d;
+
             int iteration = 0;
 
 
@@ -54,6 +55,7 @@ namespace MainSolver.Solvers
                 CalculateFlows(ref net, hb, vb);
                 net.CalculateResiduals();
                 resVec = ResidualVector(net);
+                euclidNorm = resVec.Norm(2);
                 correction = PressureCorrection(net, hb, vb);
                 ApplyCorrection(ref net, correction);
                 iteration++;
