@@ -142,9 +142,36 @@ namespace NetworkDisplay
                     ellipse.Fill = new SolidColorBrush(Colors.Black);
                     ellipse.ToolTip = NodeToolTip(network, i, j);
 
-                    Canvas.SetLeft(ellipse, network.x[i][j] * scl - Radius + translate);
-                    Canvas.SetTop(ellipse, (network.y[i][j]) * scl - Radius + translate);
+                    var setX = network.x[i][j] * scl - Radius + translate;
+                    var setY = (network.y[i][j]) * scl - Radius + translate;
+
+                    Canvas.SetLeft(ellipse, setX);
+                    Canvas.SetTop(ellipse, setY);
                     mycanvas.Children.Add(ellipse);
+
+
+                    if (i == 0 || i==N-1)
+                    {
+                        if (j == 0 || j == N-1)
+                        {
+                            var textBlock = new TextBlock();
+                            
+                            textBlock.Text = Math.Round(network.pressure[i][j],2).ToString();
+
+                            if (i == N - 1 && j == N - 1)
+                                textBlock.Text = "   0";
+
+                            textBlock.FontSize = ellipse.Width/2.2;
+                            textBlock.Foreground = new SolidColorBrush(Colors.AliceBlue);
+
+                            Canvas.SetLeft(textBlock, setX);
+                            Canvas.SetTop(textBlock, setY + ellipse.Height/1.2d);
+                            mycanvas.Children.Add(textBlock);
+                            textBlock.RenderTransform = new ScaleTransform(1,-1);
+                        }
+                    }
+
+
                 }
             }
 
