@@ -9,7 +9,7 @@ namespace MainSolver.Solvers
 {
     public class UniformBinghamSolver
     {
-        
+
         //Regularising Constant for iterative solver  
         private readonly double reg = Math.Pow(10, -5);
 
