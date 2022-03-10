@@ -12,5 +12,6 @@ namespace MainSolver
         public static string InternalFiles = Application + "/Files";
         public static string Distributions = InternalFiles + "/Distributions.csv";
 
+        public static string Results = "C:\\ME FYP\\Results";
     }
 }

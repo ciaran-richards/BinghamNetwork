@@ -235,7 +235,7 @@ namespace MainSolver
             // Horizontal Channels
             for (int i = 0; i < N - 1; i++)
             {
-                for (int j = 0; j < N; j++)
+                for (int j = 0; j < N - 1; j++)
                 {
                     var deltaX = x[i + 1][j] - x[i][j];
                     var deltaY = y[i + 1][j] - y[i][j];
@@ -246,7 +246,7 @@ namespace MainSolver
             }
 
             //Vertical Channels
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < N - 1; i++)
             {
                 for (int j = 0; j < N - 1; j++)
                 {
@@ -258,7 +258,7 @@ namespace MainSolver
                 }
             }
             FlowRate = Math.Sqrt(HorizFlow * HorizFlow + VertFlow * VertFlow);
-            FlowAngle = Math.Atan(VertFlow/HorizFlow);
+            FlowAngle = Math.Atan2(VertFlow,HorizFlow);
         }
 
         public Network Copy()

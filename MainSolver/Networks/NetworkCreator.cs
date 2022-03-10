@@ -12,6 +12,10 @@ namespace MainSolver
 {
     public class NetworkCreator
     {
+        //Share Random Number Generators as much as possible to prevent identical instances and seeds
+
+        private Random randomiser;
+        
         //The normal standard deviations and corresponding cumulative probability. Symmetric about 0. 
         private readonly List<double> stanDev;
         private readonly List<double> cuProb;
@@ -24,6 +28,7 @@ namespace MainSolver
 
         public NetworkCreator()
         {
+            randomiser = new Random();
             stanDev = new List<double>(MAXINDEX);
             cuProb = new List<double>(MAXINDEX);
             using (StreamReader input = File.OpenText(Paths.Distributions))
@@ -66,8 +71,6 @@ namespace MainSolver
             var max_dx = dxLimit * creatorSett.DisplacementLimit;
             var max_dy = max_dx;
 
-            var randomHelper = new Random();
-            
             for (int i = 0; i < N - 1; i++)
             {
                 for (int j = 0; j < N - 1; j++)
@@ -76,13 +79,13 @@ namespace MainSolver
                         switch (creatorSett.DisplacementDistro)
                         {
                             case Distro.Normal:
-                                netSet.dx[i][j] = RandNormDeviation(max_dx, ref randomHelper);
-                                netSet.dy[i][j] = RandNormDeviation(max_dy, ref randomHelper);
+                                netSet.dx[i][j] = RandNormDeviation(max_dx, randomiser);
+                                netSet.dy[i][j] = RandNormDeviation(max_dy, randomiser);
                                 break;
 
                             case Distro.Uniform:
-                                netSet.dx[i][j] = RandUnifDeviation(max_dx, ref randomHelper);
-                                netSet.dy[i][j] = RandUnifDeviation(max_dy, ref randomHelper);
+                                netSet.dx[i][j] = RandUnifDeviation(max_dx, randomiser);
+                                netSet.dy[i][j] = RandUnifDeviation(max_dy, randomiser);
                                 break;
 
                         }
@@ -90,13 +93,13 @@ namespace MainSolver
                         switch (creatorSett.TaperDistro)
                         {
                             case Distro.Normal:
-                                netSet.vTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, ref randomHelper);
-                                netSet.hTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, ref randomHelper);
+                                netSet.vTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, randomiser);
+                                netSet.hTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, randomiser);
                                 break;
 
                             case Distro.Uniform:
-                                netSet.vTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, ref randomHelper);
-                                netSet.hTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, ref randomHelper);
+                                netSet.vTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, randomiser);
+                                netSet.hTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, randomiser);
                                 break;
                         }
 
@@ -122,14 +125,14 @@ namespace MainSolver
             return network;
         }
 
-        private double RandUnifDeviation(double maximum, ref Random ran)
+        private double RandUnifDeviation(double maximum, Random ran)
         {
             var dxRan = ran.NextDouble();
             double sign = ran.NextBoolean() ? 1:-1;
             return dxRan * maximum * sign;
         }
 
-        private double RandNormDeviation(double maximum, ref Random ran)
+        private double RandNormDeviation(double maximum, Random ran)
         {
             //Generate a random deviation from mean in a Normal (Gaussian) Distribution
 

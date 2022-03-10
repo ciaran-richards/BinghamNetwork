@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MainSolver.Solvers
-{ 
-    interface ISolver
+{
+    public interface IBinghamSolver
     {
+        Network Solve(Network network);
     }
 }
