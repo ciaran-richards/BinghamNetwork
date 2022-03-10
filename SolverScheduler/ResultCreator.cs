@@ -10,25 +10,38 @@ namespace SolverScheduler
 {
     class ResultCreator
     {
-        private UniformBinghamSolver BinghamSolver;
-        private NewtonianSolver NewtonSolver;
+       // private UniformBinghamSolver BinghamSolver;
+        //private NewtonianSolver NewtonSolver;
         private NetworkCreator NetworkCreator;
 
         private const double Deg = 180 / Math.PI;
+        private const double Rad = Math.PI / 180;
+        private const int MaxAngle = 90;
 
         public ResultCreator()
         {
-            BinghamSolver = new UniformBinghamSolver();
-            NewtonSolver = new NewtonianSolver();
+            //BinghamSolver = new UniformBinghamSolver();
+            //NewtonSolver = new NewtonianSolver();
         }
 
-        List<ResultStruct> EvaluateAngleRange()
+        public List<ResultStruct> EvaluateAngleRange(Network[] Networks, double pGrad)
         {
-            return new List<ResultStruct>();
+            
+            double angle;
+            var ResultRange = new List<ResultStruct>(MaxAngle+1);
+            for (int i = 0; i < MaxAngle+1; i++)
+            {
+                angle = i * Rad;
+                ResultRange.Add(Evaluate(Networks, pGrad, angle));
+            }
+
+            return ResultRange;
         }
 
         public ResultStruct Evaluate(Network[] Networks, double pGrad, double pAngle)
         {
+            var BinghamSolver = new UniformBinghamSolver();
+            var NewtonSolver = new NewtonianSolver();
             int Count = Networks.Length;
             //If Flow is Zero, the Angle is Not A Number, exclude from all processing. 
             double YieldPressure = 0.5;

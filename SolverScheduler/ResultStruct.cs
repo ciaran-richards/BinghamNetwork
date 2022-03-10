@@ -8,12 +8,12 @@ namespace SolverScheduler
 { 
     struct ResultStruct
     {
-        public double BinghamGradient;
-        public double BinghamGradAngle;
-        public double FlowRatioMean;
-        public double FlowRatioSD;
-        public double FlowAngleMean;
-        public double FlowAngleSD;
+        public double BinghamGradient { get; set; }
+        public double BinghamGradAngle { get; set; }
+        public double FlowRatioMean { get; set; }
+        public double FlowRatioSD { get; set; }
+        public double FlowAngleMean { get; set; }
+        public double FlowAngleSD { get; set; }
     }
     
 }
