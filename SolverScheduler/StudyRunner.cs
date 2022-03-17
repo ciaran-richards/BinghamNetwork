@@ -17,7 +17,7 @@ namespace SolverScheduler
             creatorSettings.Length = 1;
             creatorSettings.Nodes = 12;
             creatorSettings.DisplacementDistro = Distro.Uniform;
-            creatorSettings.DisplacementLimit = 0;
+            creatorSettings.DisplacementLimit = 1;
             creatorSettings.TaperDistro = Distro.Uniform;
             creatorSettings.TaperLimit = 0;
 

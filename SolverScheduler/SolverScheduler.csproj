@@ -85,10 +85,6 @@
       <Project>{cc8d205b-5772-450b-8852-dfefc37e458a}</Project>
       <Name>MainSolver</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TaperedLookup\TaperedLookup.csproj">
-      <Project>{4211da0e-ee38-4f15-b1a2-a56cdc1d000e}</Project>
-      <Name>TaperedLookup</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
