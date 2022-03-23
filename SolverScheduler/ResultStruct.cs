@@ -12,8 +12,8 @@ namespace SolverScheduler
         public double BinghamGradAngle { get; set; }
         public double FlowRatioMean { get; set; }
         public double FlowRatioSD { get; set; }
-        public double FlowAngleMean { get; set; }
-        public double FlowAngleSD { get; set; }
+        public double FlowAngleDeltaMean { get; set; }
+        public double FlowAngleDeltaSD { get; set; }
     }
     
 }

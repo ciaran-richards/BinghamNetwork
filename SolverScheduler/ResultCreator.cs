@@ -10,8 +10,7 @@ namespace SolverScheduler
 {
     class ResultCreator
     {
-       // private UniformBinghamSolver BinghamSolver;
-        //private NewtonianSolver NewtonSolver;
+
         private NetworkCreator NetworkCreator;
 
         private const double Deg = 180 / Math.PI;
@@ -20,8 +19,7 @@ namespace SolverScheduler
 
         public ResultCreator()
         {
-            //BinghamSolver = new UniformBinghamSolver();
-            //NewtonSolver = new NewtonianSolver();
+
         }
 
         public List<ResultStruct> EvaluateAngleRange(Network[] Networks, double pGrad)
@@ -48,9 +46,9 @@ namespace SolverScheduler
             int AngleSamples = 0;
 
             double[] flowArray = new double[Count];
-            double[] angleArray = new double[Count];
+            double[] angleDeltaArray = new double[Count];
             double SumFlow = 0;
-            double SumAngle = 0;
+            double SumAngleDelta = 0;
 
             Network newtonNet;
             Network binghamNet;
@@ -66,12 +64,15 @@ namespace SolverScheduler
                 flowArray[i] = binghamNet.FlowRate / newtonNet.FlowRate;
                 SumFlow += flowArray[i];
 
-                angleArray[i] = binghamNet.FlowAngle;
+                angleDeltaArray[i] = (binghamNet.FlowAngle - newtonNet.FlowAngle);
                 if (!double.IsNaN(binghamNet.FlowAngle))
                 {
-                    SumAngle += binghamNet.FlowAngle;
+                    SumAngleDelta += (binghamNet.FlowAngle - newtonNet.FlowAngle);
                     AngleSamples += 1;
                 }
+
+                Console.WriteLine(i);
+
             }
 
             //Flow Mean and Standard Deviation
@@ -86,16 +87,16 @@ namespace SolverScheduler
             double angleMean = 0;
             if (AngleSamples > 0)
             {
-                angleMean = SumAngle / AngleSamples;
+                angleMean = SumAngleDelta / AngleSamples;
             }
             double angleSD = 0;
             double angleSumSquares = 0;
 
             for (int i = 0; i < AngleSamples; i++)
             {
-                if (!double.IsNaN(angleArray[i]))
+                if (!double.IsNaN(angleDeltaArray[i]))
                 {
-                    angleSumSquares += (angleArray[i] - angleMean) * (angleArray[i] - angleMean);
+                    angleSumSquares += (angleDeltaArray[i] - angleMean) * (angleDeltaArray[i] - angleMean);
                 }
             }
             
@@ -109,8 +110,8 @@ namespace SolverScheduler
             result.BinghamGradAngle = pAngle * Deg;
             result.FlowRatioMean = flowMean;
             result.FlowRatioSD = flowSD;
-            result.FlowAngleMean = angleMean*Deg;
-            result.FlowAngleSD = angleSD*Deg;
+            result.FlowAngleDeltaMean = angleMean*Deg;
+            result.FlowAngleDeltaSD = angleSD*Deg;
 
             return result;
         }

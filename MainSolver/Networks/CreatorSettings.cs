@@ -13,31 +13,22 @@ namespace MainSolver
         public double Bingham;
         public double Length;
         public Distro DisplacementDistro;
-        private double displacementLimit;
-        public double DisplacementLimit
+        public double DisplacementLimit;
+        private double widthDevLimit;
+        public Distro WidthDistro;
+        public double dzLimit;
+        public double WidthDevLimit
         {
-            get { return displacementLimit;}
+            get { return widthDevLimit; }
             set
             {
                 if ((value < 0) || (value > 1))
-                    displacementLimit = 0;
+                    widthDevLimit = 0;
                 else
-                    displacementLimit = value;
+                    widthDevLimit = value;
             }
         }
 
-        public Distro TaperDistro;
-        private double taperLimit;
-        public double TaperLimit
-        {
-            get { return taperLimit; }
-            set
-            {
-                if ((value < 0) || (value > 1))
-                    taperLimit = 0;
-                else
-                    taperLimit = value;
-            }
-        }
+
     }
 }

@@ -55,21 +55,25 @@ namespace MainSolver
 
             netSet.dx = new double[N][];
             netSet.dy = new double[N][];
-            netSet.hTaper = new double[N - 1][];
-            netSet.vTaper = new double[N][];
+            netSet.dz = new double[N][];
+            netSet.hWidth = new double[N - 1][];
+            netSet.vWidth = new double[N][];
             for (int i = 0; i <= N - 1; i++)
             {
                 netSet.dx[i] = new double[N];
                 netSet.dy[i] = new double[N];
-                netSet.vTaper[i] = new double[N - 1];
+                netSet.dz[i] = new double[N];
+                netSet.vWidth[i] = new double[N - 1];
                 if (i < N - 1)
-                    netSet.hTaper[i] = new double[N];
+                    netSet.hWidth[i] = new double[N];
             }
 
             double dxLimit = creatorSett.Length / (2 * ((double)N - 1));
             double dyLimit = dxLimit;
+            double dzLimit = dxLimit;
             var max_dx = dxLimit * creatorSett.DisplacementLimit;
             var max_dy = max_dx;
+            var max_dz = dzLimit * creatorSett.dzLimit;
 
             for (int i = 0; i < N - 1; i++)
             {
@@ -81,25 +85,27 @@ namespace MainSolver
                             case Distro.Normal:
                                 netSet.dx[i][j] = RandNormDeviation(max_dx, randomiser);
                                 netSet.dy[i][j] = RandNormDeviation(max_dy, randomiser);
+                                netSet.dz[i][j] = RandNormDeviation(max_dz, randomiser);
                                 break;
 
                             case Distro.Uniform:
                                 netSet.dx[i][j] = RandUnifDeviation(max_dx, randomiser);
                                 netSet.dy[i][j] = RandUnifDeviation(max_dy, randomiser);
+                                netSet.dz[i][j] = RandUnifDeviation(max_dz, randomiser);
                                 break;
 
                         }
 
-                        switch (creatorSett.TaperDistro)
+                        switch (creatorSett.WidthDistro)
                         {
                             case Distro.Normal:
-                                netSet.vTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, randomiser);
-                                netSet.hTaper[i][j] = RandNormDeviation(creatorSett.TaperLimit, randomiser);
+                                netSet.vWidth[i][j] = 1 + RandNormDeviation(creatorSett.WidthDevLimit, randomiser);
+                                netSet.hWidth[i][j] = 1 + RandNormDeviation(creatorSett.WidthDevLimit, randomiser);
                                 break;
 
                             case Distro.Uniform:
-                                netSet.vTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, randomiser);
-                                netSet.hTaper[i][j] = RandUnifDeviation(creatorSett.TaperLimit, randomiser);
+                                netSet.vWidth[i][j] = 1 + RandUnifDeviation(creatorSett.WidthDevLimit, randomiser);
+                                netSet.hWidth[i][j] = 1 + RandUnifDeviation(creatorSett.WidthDevLimit, randomiser);
                                 break;
                         }
 
@@ -108,7 +114,8 @@ namespace MainSolver
                 //Vertically repeating
                 netSet.dx[i][N - 1] = netSet.dx[i][0];
                 netSet.dy[i][N - 1] = netSet.dy[i][0];
-                netSet.hTaper[i][N - 1] = netSet.hTaper[i][0];
+                netSet.dz[i][N - 1] = netSet.dz[i][0];
+                netSet.hWidth[i][N - 1] = netSet.hWidth[i][0];
             }
 
             //Horizontally repeating
@@ -116,8 +123,9 @@ namespace MainSolver
             {
                 netSet.dx[N - 1][j] = netSet.dx[0][j];
                 netSet.dy[N - 1][j] = netSet.dy[0][j];
+                netSet.dz[N - 1][j] = netSet.dz[0][j];
                 if (j < N - 1) 
-                    netSet.vTaper[N - 1][j] = netSet.vTaper[0][j];
+                    netSet.vWidth[N - 1][j] = netSet.vWidth[0][j];
             }
 
             //Send network config to constructor to build network

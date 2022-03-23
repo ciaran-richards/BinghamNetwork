@@ -18,8 +18,9 @@ namespace SolverScheduler
             creatorSettings.Nodes = 12;
             creatorSettings.DisplacementDistro = Distro.Uniform;
             creatorSettings.DisplacementLimit = 1;
-            creatorSettings.TaperDistro = Distro.Uniform;
-            creatorSettings.TaperLimit = 0;
+            creatorSettings.dzLimit = 0;
+            creatorSettings.WidthDistro = Distro.Uniform;
+            creatorSettings.WidthDevLimit = 0.5;
 
 
             var netFactory = new NetworkListMaker();
@@ -28,15 +29,15 @@ namespace SolverScheduler
 
             var rad = Math.PI / 180;
             var resultFactory = new ResultCreator();
-            var Data = resultFactory.EvaluateAngleRange(netList, 5);
+            var Data = resultFactory.EvaluateAngleRange(netList, 3);
 
             var csvWritter = new CsvCreator();
 
-            csvWritter.CreateCsv(Data, "five");
+            csvWritter.CreateCsv(Data, "dhThreeUnif");
 
             var meanFlow = Data.Select(x => x.FlowRatioMean);
-            var meanAngle = Data.Select(x => x.FlowAngleMean);
-
+            var meanAngle = Data.Select(x => x.FlowAngleDeltaMean);
+            int h = 7;
         }
     }
 }

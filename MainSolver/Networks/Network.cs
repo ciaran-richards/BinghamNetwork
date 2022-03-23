@@ -62,10 +62,10 @@ namespace MainSolver
         
         private double[][] dx; //
         private double[][] dy; //
-
+        public double[][] dz; //
         //Channel Properties
-        public double[][] hTaper { get; private set; } //
-        public double[][] vTaper { get; private set; } //
+        public double[][] hWidth { get; private set; } //
+        public double[][] vWidth { get; private set; } //
         public double[][] hLength { get; private set; }
         public double[][] inv_hLength { get; private set; } //Pre-compute as this will be used often
         public double[][] vLength { get; private set; }
@@ -89,8 +89,9 @@ namespace MainSolver
             Length = sett.Length;
             dx = sett.dx;
             dy = sett.dy;
-            hTaper = sett.hTaper;
-            vTaper = sett.vTaper;
+            dz = sett.dz;
+            hWidth = sett.hWidth;
+            vWidth = sett.vWidth;
 
             //Initialise all fields and set to zero;
             InitialiseFields();
@@ -117,7 +118,8 @@ namespace MainSolver
                 {
                     var deltaX = x[i + 1][j] - x[i][j];
                     var deltaY = y[i + 1][j] - y[i][j];
-                    hLength[i][j] = Math.Sqrt(deltaX*deltaX + deltaY*deltaY);
+                    var deltaZ = dz[i + 1][j] - dz[i][j];
+                    hLength[i][j] = Math.Sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
                     inv_hLength[i][j] = 1 / hLength[i][j];
                 }
             }
@@ -129,7 +131,8 @@ namespace MainSolver
                 {
                     var deltaX = x[i][j+1] - x[i][j];
                     var deltaY = y[i][j+1] - y[i][j];
-                    vLength[i][j] = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+                    var deltaZ = dz[i][j + 1] - dz[i][j];
+                    vLength[i][j] = Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
                     inv_vLength[i][j] = 1 / vLength[i][j];
                 }
             }

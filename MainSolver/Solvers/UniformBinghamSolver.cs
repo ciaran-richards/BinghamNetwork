@@ -9,7 +9,7 @@ namespace MainSolver.Solvers
 {
     public class UniformBinghamSolver
     {
-
+        private DenseMatrix Jacobian;
         //Regularising Constant for iterative solver  
         private readonly double reg = Math.Pow(10, -5);
 
@@ -55,10 +55,18 @@ namespace MainSolver.Solvers
                 CalculateFlows(ref net, hb, vb);
                 net.CalculateResiduals();
                 resVec = ResidualVector(net);
-                euclidNorm = resVec.Norm(2);
                 correction = PressureCorrection(net, hb, vb);
                 ApplyCorrection(ref net, correction);
                 iteration++;
+                var debug = net.PressAngle * 180 / 3.14;
+
+                if (iteration > 20000)
+                {
+                    throw new Exception("Unstable Iteration");
+                    int h = 8;
+                }
+                
+
             }
             net.CalculateBulkFlow();
 
@@ -75,7 +83,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
-                    bGrad[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) *0.5 * net.inv_hLength[i][j] * net.Inv_Yield;
+                    bGrad[i][j] = -(net.pressure[i+1][j] -net.pressure[i][j]) *net.hWidth[i][j] *0.5 *net.inv_hLength[i][j] *net.Inv_Yield;
                 }
             }
 
@@ -91,7 +99,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    bGrad[i][j] = -(net.pressure[i][j + 1] - net.pressure[i][j]) * 0.5 * net.inv_vLength[i][j] * net.Inv_Yield; 
+                    bGrad[i][j] = -(net.pressure[i][j + 1] -net.pressure[i][j]) *net.vWidth[i][j] *0.5 *net.inv_vLength[i][j] *net.Inv_Yield; 
                 }
             }
             return bGrad;
@@ -127,7 +135,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
-                    net.hFlow[i][j] = FlowRate(hBingham[i][j]) * 2 * net.YieldPressure;
+                    net.hFlow[i][j] = FlowRate(hBingham[i][j]) * 2 * net.YieldPressure * Math.Pow(net.hWidth[i][j], 2);
                 }
             }
 
@@ -136,7 +144,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    net.vFlow[i][j] = FlowRate(vBingham[i][j]) * 2 * net.YieldPressure;
+                    net.vFlow[i][j] = FlowRate(vBingham[i][j]) * 2 * net.YieldPressure * Math.Pow(net.vWidth[i][j], 2);
                 }
             }
 
@@ -215,6 +223,9 @@ namespace MainSolver.Solvers
             //Create the full matrix with external library
             //The diagonal term is then the negative sum of the other terms on its row 
 
+            var hCoef = HChannelCoef(net);
+            var vCoef = VChannelCoef(net);
+
             double[] row;
             for (int q = 0; q < N - 1; q++)
             {
@@ -229,35 +240,32 @@ namespace MainSolver.Solvers
                         if (p < N - 2)
                         {
                             //Derivative wrt RH node Pressure - Except Right Bound
-                            row[u + 1] = FlowDerivative(hB[p][q]) * net.inv_hLength[p][q] * 2 * yield; //*0.5;
-                            //row[u + 1] = net.inv_hLength[p][q];
+                            row[u + 1] = FlowDerivative(hB[p][q]) * hCoef[p][q];
                         }
                         
                         if (p == 0 && q > 0)
                         {
                             //Derivative wrt RH node Pressure - Right Bound
-                            row[u + (N - 2)] = FlowDerivative(hB[N - 2][q]) * net.inv_hLength[N - 2][q] * 2 * yield; //*0.5;
-                            //row[u + (N - 2)] = net.inv_hLength[N - 2][q];
+                            row[u + (N - 2)] =
+                                FlowDerivative(hB[N - 2][q]) * hCoef[N - 2][q];
                         }
 
                         if (u + N - 1 < M)
                         {  //Derivative wrt Upper node Pressure - Except Top Bound
-                            row[u + N - 1] = FlowDerivative(vB[p][q]) * net.inv_vLength[p][q] * 2 * yield; //*0.5;
-                            //row[u + N - 1] = net.inv_vLength[p][q];
+                            row[u + N - 1] = FlowDerivative(vB[p][q]) * vCoef[p][q];
                         }
 
                         if (u + (N - 2) * (N - 1) < M)
                         {
                             //Derivative wrt top node pressure on it's column - Bottom Bound only
-                            row[u + (N - 2) * (N - 1)] = FlowDerivative(vB[p][N - 2]) * net.inv_vLength[p][N - 2] * 2 * yield; //*0.5; //Bottom
-                            //row[u + (N - 2) * (N - 1)] = net.inv_vLength[p][N - 2];
+                            row[u + (N - 2) * (N - 1)] = FlowDerivative(vB[p][N - 2]) * vCoef[p][N - 2];
                         }
                         rowArrays[u] = row;
                     }
                 }
             }
 
-            var Jacobian = DenseMatrix.OfRowArrays(rowArrays);
+            Jacobian = DenseMatrix.OfRowArrays(rowArrays);
             var lowerAT = Jacobian.Transpose().StrictlyLowerTriangle();
             Jacobian = (DenseMatrix)Jacobian.Add(lowerAT);
 
@@ -268,11 +276,11 @@ namespace MainSolver.Solvers
             }
 
             //Add boundary conditions four diagonal terms
-            Jacobian[0, 0] = Jacobian[0, 0] - FlowDerivative(hB[0][0]) * net.inv_hLength[0][0] * 2 * yield;
-            Jacobian[N-2, N-2] = Jacobian[N-2, N-2] - FlowDerivative(vB[0][0]) * net.inv_vLength[0][0] * 2 * yield;
-            Jacobian[N-3, N-3] = Jacobian[N-3, N-3] - FlowDerivative(hB[N-2][0]) * net.inv_hLength[N-2][0] * 2 * yield;
+            Jacobian[0, 0] = Jacobian[0, 0] - FlowDerivative(hB[0][0]) * hCoef[0][0];
+            Jacobian[N - 2, N - 2] = Jacobian[N - 2, N - 2] - FlowDerivative(vB[0][0]) * vCoef[0][0];
+            Jacobian[N - 3, N - 3] = Jacobian[N - 3, N - 3] - FlowDerivative(hB[N - 2][0]) * hCoef[N - 2][0];
             u = (N - 1) * (N - 2) - 1;
-            Jacobian[u,u] = Jacobian[u,u] - FlowDerivative(vB[0][N-2]) * net.inv_vLength[0][N-2] * 2 * yield;
+            Jacobian[u, u] = Jacobian[u, u] - FlowDerivative(vB[0][N - 2]) * vCoef[0][N - 2];
 
 
 
@@ -287,8 +295,6 @@ namespace MainSolver.Solvers
             var invJac = Jacobian.Inverse();
 
             var pressureCorrect = (DenseVector)invJac.Multiply(-resVec);
-
-            //var normVec = pressureCorrect.Normalize(2);
 
             return (DenseVector)pressureCorrect;
         }
@@ -319,5 +325,51 @@ namespace MainSolver.Solvers
                 net.pressure[k][N - 1] = net.pressure[k][0] - V;
             }
         }
+
+        private double[][] HChannelCoef(Network net)
+        {
+            int u;
+            int N = net.Nodes;
+            var hCoef = new double[N - 1][];
+
+            for (int i = 0; i < N - 1; i++)
+            {
+                hCoef[i] = new double[N];
+            }
+
+            //Calculate horizonal lengths
+            for (int i = 0; i < N - 1; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+
+                    hCoef[i][j] = net.inv_hLength[i][j] * Math.Pow(net.hWidth[i][j], 3);
+                }
+            }
+
+            return hCoef;
+        }
+
+        private double[][] VChannelCoef(Network net)
+        {
+            int u;
+            int N = net.Nodes;
+            double[][] vCoef = new double[N][];
+            for (int i = 0; i <= N - 1; i++)
+            {
+                vCoef[i] = new double[N - 1];
+            }
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N - 1; j++)
+                {
+                    vCoef[i][j] = net.inv_vLength[i][j] * Math.Pow(net.vWidth[i][j], 3);
+                }
+            }
+
+            return vCoef;
+        }
+
     }
 }
