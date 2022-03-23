@@ -1,4 +1,10 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using MainSolver;
 
 namespace SolverScheduler
 {
@@ -6,8 +12,11 @@ namespace SolverScheduler
     {
         static void Main(string[] args)
         {
-            var runner = new StudyRunner();
-            runner.RunStudy();
+            var studyRunner = new StudyRunner();
+            studyRunner.RunStudy();
+
+            Console.ReadLine();
+
         }
 
     }

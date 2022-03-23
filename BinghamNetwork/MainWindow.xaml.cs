@@ -35,16 +35,11 @@ namespace NetworkDisplay
             int nods = 3;
             try
             {
-                displacePerc = double.Parse(displaceText)/100;
+                displacePerc = double.Parse(displaceText);
                 nods = int.Parse(nodeText);
             }
             //Do Nothing
             catch { }
-
-            if ((displacePerc < 0) || (displacePerc>1))
-            {
-                displacePerc = 0;
-            }
 
             if ((nods < 0) || (nods > 100))
             {
@@ -58,10 +53,11 @@ namespace NetworkDisplay
             sett.Name = "Hi";
             sett.Nodes = nods;
             sett.DisplacementDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal;
-            sett.TaperDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal; 
+            sett.WidthDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal; 
             sett.Length = 1;
             sett.DisplacementLimit = displacePerc;
-            sett.TaperLimit = 1;
+            sett.dzLimit = 0;
+            sett.WidthDevLimit = 1;
             
             var net = solverApi.CreateNetwork(sett);
             net.YieldPressure = 0.5;
@@ -130,6 +126,24 @@ namespace NetworkDisplay
         {
             selectedNetwork.GradPressure += 0.025 *(double)e.Delta/120d;
             PGrad.Text = Math.Round(selectedNetwork.GradPressure,5).ToString();
+            UpdateCanvas();
+        }
+
+    
+
+        private void NetworkRegion_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.W || e.Key == Key.Up)
+            {
+                selectedNetwork.PressAngle += 2 * Math.PI / 180;
+            }
+
+            if (e.Key == Key.S || e.Key == Key.Down)
+            {
+                selectedNetwork.PressAngle -= 2 * Math.PI / 180;
+            }
+
+            PressureAngle.Text = Math.Round(selectedNetwork.PressAngle, 5).ToString();
             UpdateCanvas();
         }
     }

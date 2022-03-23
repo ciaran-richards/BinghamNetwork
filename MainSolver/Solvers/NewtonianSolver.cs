@@ -38,12 +38,15 @@ namespace MainSolver
                 net.pressure[k][N-1] = net.pressure[k][0] - V;
             }
 
+            var hCoef = HChannelCoef(net);
+            var vCoef = VChannelCoef(net);
+
             //Calculate horizontal flow
             for (int i = 0; i < N - 1; i++)
             {
                 for (int j = 0; j < N; j++)
                 {
-                    net.hFlow[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * net.inv_hLength[i][j];
+                    net.hFlow[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * hCoef[i][j];
                 }
             } 
             //Calculate vertical flow
@@ -51,7 +54,7 @@ namespace MainSolver
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    net.vFlow[i][j] = -(net.pressure[i][j+1] - net.pressure[i][j]) * net.inv_vLength[i][j];
+                    net.vFlow[i][j] = -(net.pressure[i][j+1] - net.pressure[i][j]) * vCoef[i][j];
                 }
             }
             
@@ -83,6 +86,10 @@ namespace MainSolver
             double[] row;
             double diag;
 
+            var hCoef = HChannelCoef(net);
+            var vCoef = VChannelCoef(net);
+
+
             for (int q = 0; q < N - 1; q++)
             {
                 for (int p = 0; p < N - 1; p++)
@@ -93,62 +100,62 @@ namespace MainSolver
                         diag = 0;
                         row = new double[M];
                        //Diagonal Component Calculation
-                        diag -= (net.inv_hLength[p][q] + net.inv_vLength[p][q]);
+                        diag -= (hCoef[p][q] + vCoef[p][q]);
                         if (p > 0)
-                            diag -= (net.inv_hLength[p - 1][q]); //Except Left Boundary
+                            diag -= (hCoef[p - 1][q]); //Except Left Boundary
                         else
-                            diag -= (net.inv_hLength[N - 2][q]); //Left
+                            diag -= (hCoef[N - 2][q]); //Left
                         if (q > 0)
-                            diag -= (net.inv_vLength[p][q - 1]); //Except Bottom
+                            diag -= (vCoef[p][q - 1]); //Except Bottom
                         else
-                            diag -= (net.inv_vLength[p][N - 2]); //Bottom
+                            diag -= (vCoef[p][N - 2]); //Bottom
                         row[u] = diag;
 
                         //Other row components, Top half only
                         if (p < N - 2)
-                            row[u + 1] = net.inv_hLength[p][q]; //Except Right Bound
+                            row[u + 1] = hCoef[p][q]; //Except Right Bound
                         if (p == 0 && q > 0)
-                            row[u + (N - 2)] = net.inv_hLength[N - 2][q]; //Right
+                            row[u + (N - 2)] = hCoef[N - 2][q]; //Right
                         if (u + N - 1 < M)
-                            row[u + N - 1] = net.inv_vLength[p][q]; //Except Top
+                            row[u + N - 1] = vCoef[p][q]; //Except Top
                         if (u + (N - 2) * (N - 1) < M)
-                            row[u + (N - 2) * (N - 1)] = net.inv_vLength[p][N - 2]; //Bottom
+                            row[u + (N - 2) * (N - 1)] = vCoef[p][N - 2]; //Bottom
                         rowArrays[u] = row;
 
                         //Vector B and C Calculations
                         
                         if (p == 0) //Left
                         {
-                            B[u] -= net.inv_hLength[N - 2][q];
+                            B[u] -= hCoef[N - 2][q];
                             if (q == 1)
                             {
-                                B[u] -= net.inv_vLength[0][0];
-                                C[u] -= net.inv_vLength[0][0]; //Left Bottom
+                                B[u] -= vCoef[0][0];
+                                C[u] -= vCoef[0][0]; //Left Bottom
                             }
                             if (q == N - 2)
                             {
-                                B[u] -= net.inv_vLength[0][N - 2]; //Left Top
+                                B[u] -= vCoef[0][N - 2]; //Left Top
                             }
                         }
                         if (q == N - 2 && p > 0)
-                            C[u] += net.inv_vLength[p][q]; //Top but Exclude Left
+                            C[u] += vCoef[p][q]; //Top but Exclude Left
 
 
                         if (q == 0) //Bottom
                         {
-                            C[u] -= net.inv_vLength[p][N - 2];
+                            C[u] -= vCoef[p][N - 2];
                             if (p == 1)
                             {
-                                B[u] -= net.inv_hLength[0][0];
-                                C[u] -= net.inv_hLength[0][0]; //Bottom Left
+                                B[u] -= hCoef[0][0];
+                                C[u] -= hCoef[0][0]; //Bottom Left
                             }
                             if (p == N - 2)
                             {
-                                C[u] -= net.inv_hLength[N - 2][0]; //Bottom Right
+                                C[u] -= hCoef[N - 2][0]; //Bottom Right
                             }
                         }
                         if (p == N - 2 && q > 0)
-                            B[u] += net.inv_hLength[p][q]; //Right but Exclude Bottom
+                            B[u] += hCoef[p][q]; //Right but Exclude Bottom
 
                     }
                 }
@@ -167,5 +174,49 @@ namespace MainSolver
             return pressureVec;
         }
 
+        private double[][] HChannelCoef(Network net)
+        {
+            int u;
+            int N = net.Nodes;
+            var hCoef = new double[N - 1][];
+
+            for (int i = 0; i < N - 1; i++)
+            {
+                hCoef[i] = new double[N];
+            }
+
+            //Calculate horizonal lengths
+            for (int i = 0; i < N - 1; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    
+                    hCoef[i][j] = net.inv_hLength[i][j]*Math.Pow(net.hWidth[i][j],3);
+                }
+            }
+
+            return hCoef;
+        }
+
+        private double[][] VChannelCoef(Network net)
+        {
+            int u;
+            int N = net.Nodes;
+            double[][] vCoef = new double[N][];
+            for (int i = 0; i <= N - 1; i++)
+            {
+                vCoef[i] = new double[N - 1];
+            }
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N - 1; j++)
+                {
+                    vCoef[i][j] = net.inv_vLength[i][j] * Math.Pow(net.vWidth[i][j], 3);
+                }
+            }
+
+            return vCoef;
+        }
     }
 }

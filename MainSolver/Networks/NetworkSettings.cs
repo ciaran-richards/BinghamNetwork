@@ -18,9 +18,10 @@ namespace MainSolver
         //Node Properties
         public double[][] dx; //
         public double[][] dy; //
+        public double[][] dz;
 
         //Channel Properties
-        public double[][] hTaper; //
-        public double[][] vTaper;
+        public double[][] hWidth; //
+        public double[][] vWidth;
     }
 }

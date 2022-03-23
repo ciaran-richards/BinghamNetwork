@@ -44,7 +44,7 @@ namespace NetworkDisplay
 
             var translate = scaleMargin + max / (2 * (N - 1));
 
-            
+            var nominal = network.Length * (1 / ((double)N - 1));
             var maxhFlow = network.hFlow.Max(x => x.Max(Math.Abs));
             var maxvFlow = network.vFlow.Max(x => x.Max(Math.Abs));
             var invMaxFlow = 1/Math.Max(maxvFlow, maxhFlow);
@@ -66,11 +66,16 @@ namespace NetworkDisplay
                     var y1 = network.y[i][j] * scl + translate;
                     var y2 = network.y[i + 1][j] * scl + translate;
 
-                    var r1 = Radius * (1 - network.hTaper[i][j]) / 2;
-                    var r2 = Radius * (1 + network.hTaper[i][j]) / 2;
-                    if (r1 + strokeThickness / 2 > Radius)
+                    var r1 = Radius * Depth(network.dz[i][j] / nominal) * (Visib(network.hWidth[i][j])) / 2;
+                    var r2 = Radius * Depth(network.dz[i+1][j] / nominal) * (Visib(network.hWidth[i][j])) / 2;
+
+                    //var r1 = Radius * (1 - network.hTaper[i][j]) / 2;
+                    //var r2 = Radius * (1 + network.hTaper[i][j]) / 2;
+
+
+                    if (r1 + strokeThickness / 2 > Radius*Depth(network.dz[i][j]/nominal))
                         r1 -= strokeThickness / 2;
-                    if (r2 + strokeThickness / 2 > Radius)
+                    if (r2 + strokeThickness / 2 > Radius*Depth(network.dz[i+1][j]/nominal))
                         r2 -= strokeThickness / 2;
 
                     var polyg = ChannelPolygon(x1, y1, r1, x2, y2, r2);
@@ -103,13 +108,16 @@ namespace NetworkDisplay
                     
                     var y1 = network.y[i][j] * scl + translate;
                     var y2 = network.y[i][j + 1] * scl + translate;
-                    
-                    var r1 = Radius * (1 - network.vTaper[i][j]) / 2;
-                    var r2 = Radius * (1 + network.vTaper[i][j]) / 2;
 
-                    if (r1 + strokeThickness / 2 > Radius)
+                    var r1 = Radius * Depth(network.dz[i][j]/ nominal) * (Visib(network.vWidth[i][j])) / 2;
+                    var r2 = Radius * Depth(network.dz[i][j+1] / nominal) * (Visib(network.vWidth[i][j])) / 2;
+
+                    //var r1 = Radius * (1 - network.vTaper[i][j]) / 2;
+                    //var r2 = Radius * (1 + network.vTaper[i][j]) / 2;
+
+                    if (r1 + strokeThickness / 2 > Radius* Depth(network.dz[i][j]/nominal))
                         r1 -= strokeThickness / 2;
-                    if (r2 + strokeThickness / 2 > Radius)
+                    if (r2 + strokeThickness / 2 > Radius* Depth(network.dz[i][j+1]/nominal))
                         r2 -= strokeThickness / 2;
 
 
@@ -132,21 +140,47 @@ namespace NetworkDisplay
                 }
             }
 
+
             for (int i = 0; i < network.Nodes; i++)
             {
                 for (int j = 0; j < network.Nodes; j++)
                 {
+
+                    
+
                     var ellipse = new Ellipse();
-                    ellipse.Width = Radius*2;
-                    ellipse.Height = Radius*2;
+                    ellipse.Width = Radius*2 * Depth(network.dz[i][j]/nominal);
+                    ellipse.Height = Radius*2 * Depth(network.dz[i][j]/nominal);
                     ellipse.Fill = new SolidColorBrush(Colors.Black);
+                    ellipse.Stroke = new SolidColorBrush(Colors.White);
+                    ellipse.StrokeThickness = 0.05;
                     ellipse.ToolTip = NodeToolTip(network, i, j);
+
+                    if (i != 0 && i != N - 1 && j != 0 && j != N - 1)
+                    {
+                        var dZ = network.dz[i][j];
+                        int zInd = 0;
+                        if (dZ > network.dz[i + 1][j])
+                            zInd++;
+                        if (dZ > network.dz[i - 1][j])
+                            zInd++;
+                        if (dZ > network.dz[i][j+1])
+                            zInd++;
+                        if (dZ > network.dz[i][j-1])
+                            zInd++; 
+                        
+                        Canvas.SetZIndex(ellipse,zInd);
+
+                    }
+
 
                     var setX = network.x[i][j] * scl - Radius + translate;
                     var setY = (network.y[i][j]) * scl - Radius + translate;
 
                     Canvas.SetLeft(ellipse, setX);
                     Canvas.SetTop(ellipse, setY);
+
+
                     mycanvas.Children.Add(ellipse);
 
 
@@ -161,7 +195,9 @@ namespace NetworkDisplay
                             if (i == N - 1 && j == N - 1)
                                 textBlock.Text = "   0";
 
-                            textBlock.FontSize = ellipse.Width/2.2;
+                            var font = ellipse.Width / 2.2;
+
+                            textBlock.FontSize = font > 0 ? font : 1;
                             textBlock.Foreground = new SolidColorBrush(Colors.AliceBlue);
 
                             Canvas.SetLeft(textBlock, setX);
@@ -227,10 +263,22 @@ namespace NetworkDisplay
             return polygon;
         }
 
+        private double Visib(double w)
+        {
+            return w < 0.2 ? 0.2 : w;
+        }
+
+        private double Depth(double dz)
+        {
+            return Math.Sqrt(1 + 0.7 * dz);
+        }
+
         private void FrameworkElement_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             Viewbox.Width = Viewbox.ActualHeight;
         }
+
+
     }
 
 }
