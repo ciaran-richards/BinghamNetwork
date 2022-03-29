@@ -11,10 +11,12 @@ namespace MainSolver.Solvers
     {
         private DenseMatrix Jacobian;
         //Regularising Constant for iterative solver  
-        private readonly double reg = Math.Pow(10, -5);
+        public double reg = Math.Pow(10, -5);
+        public double MaxRedidual = Math.Pow(10, -4);
 
         public Network Solve(Network net)
         {
+            //returns Null if it does not converge
             double H = net.GradPressure * Math.Cos(net.PressAngle) * net.Length;
             double V = net.GradPressure * Math.Sin(net.PressAngle) * net.Length;
             int N = net.Nodes;
@@ -48,7 +50,7 @@ namespace MainSolver.Solvers
 
 
             //while (correction.Max(x => Math.Abs(x)) / (H + V) > Math.Pow(10, -5))
-            while (net.MaxResidual > Math.Pow(10,-4) || iteration<1)
+            while (net.MaxResidual > MaxRedidual || iteration<1)
             {
                 var hb = HBinghamGrad(net);
                 var vb = VBinghamGrad(net);
@@ -60,10 +62,9 @@ namespace MainSolver.Solvers
                 iteration++;
                 var debug = net.PressAngle * 180 / 3.14;
 
-                if (iteration > 20000)
+                if (iteration > 1000)
                 {
-                    throw new Exception("Unstable Iteration");
-                    int h = 8;
+                    return null;
                 }
                 
 
@@ -135,6 +136,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
+                    net.h_Blocked[i][j] = hBingham[i][j]<1;
                     net.hFlow[i][j] = FlowRate(hBingham[i][j]) * 2 * net.YieldPressure * Math.Pow(net.hWidth[i][j], 2);
                 }
             }
@@ -144,6 +146,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
+                    net.v_Blocked[i][j] = vBingham[i][j]<1;
                     net.vFlow[i][j] = FlowRate(vBingham[i][j]) * 2 * net.YieldPressure * Math.Pow(net.vWidth[i][j], 2);
                 }
             }

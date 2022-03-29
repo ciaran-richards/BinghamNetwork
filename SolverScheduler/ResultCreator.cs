@@ -15,19 +15,14 @@ namespace SolverScheduler
 
         private const double Deg = 180 / Math.PI;
         private const double Rad = Math.PI / 180;
-        private const int MaxAngle = 90;
-
-        public ResultCreator()
-        {
-
-        }
+        private const int MaxAngle = 45;
 
         public List<ResultStruct> EvaluateAngleRange(Network[] Networks, double pGrad)
         {
             
             double angle;
             var ResultRange = new List<ResultStruct>(MaxAngle+1);
-            for (int i = 0; i < MaxAngle+1; i++)
+            for (double i = MaxAngle; i >= 27; i = i-1.5d)
             {
                 angle = i * Rad;
                 ResultRange.Add(Evaluate(Networks, pGrad, angle));
@@ -43,6 +38,7 @@ namespace SolverScheduler
             int Count = Networks.Length;
             //If Flow is Zero, the Angle is Not A Number, exclude from all processing. 
             double YieldPressure = 0.5;
+            int FlowSamples = 0;
             int AngleSamples = 0;
 
             double[] flowArray = new double[Count];
@@ -61,28 +57,40 @@ namespace SolverScheduler
                 newtonNet = NewtonSolver.Solve(Networks[i].Copy());
                 binghamNet = BinghamSolver.Solve(Networks[i].Copy());
 
-                flowArray[i] = binghamNet.FlowRate / newtonNet.FlowRate;
-                SumFlow += flowArray[i];
-
-                angleDeltaArray[i] = (binghamNet.FlowAngle - newtonNet.FlowAngle);
-                if (!double.IsNaN(binghamNet.FlowAngle))
+                if (binghamNet != null)
                 {
-                    SumAngleDelta += (binghamNet.FlowAngle - newtonNet.FlowAngle);
-                    AngleSamples += 1;
+                    flowArray[i] = binghamNet.FlowRate / newtonNet.FlowRate;
+                    SumFlow += flowArray[i];
+                    FlowSamples += 1;
+
+                    angleDeltaArray[i] = (binghamNet.FlowAngle - newtonNet.FlowAngle);
+                    if (!double.IsNaN(binghamNet.FlowAngle))
+                    {
+                        SumAngleDelta += (binghamNet.FlowAngle - newtonNet.FlowAngle);
+                        AngleSamples += 1;
+                    }
+
+                    Console.WriteLine($@"{i} +  {Math.Round(Networks[i].PressAngle * 180 / 3.14, 1)}");
                 }
-
-                Console.WriteLine(i);
-
+                else
+                {
+                    Console.WriteLine($@"{i} +  {Math.Round(Networks[i].PressAngle * 180 / 3.14, 1)} - Skipped");
+                    flowArray[i] = Double.NaN;
+                    angleDeltaArray[i] = Double.NaN;
+                }
             }
 
             //Flow Mean and Standard Deviation
-            double flowMean = SumFlow / Count;
+            double flowMean = SumFlow / FlowSamples;
             double flowSumSquares = 0;
             for (int i = 0; i < Count; i++)
             {
-                flowSumSquares += (flowArray[i] - flowMean) * (flowArray[i] - flowMean);
+                if (!double.IsNaN(flowArray[i]))
+                {
+                    flowSumSquares += (flowArray[i] - flowMean) * (flowArray[i] - flowMean);
+                }
             }
-            double flowSD = Math.Sqrt(flowSumSquares / (Count - 1));
+            double flowSD = Math.Sqrt(flowSumSquares / (FlowSamples - 1));
 
             double angleMean = 0;
             if (AngleSamples > 0)

@@ -12,7 +12,7 @@ namespace SolverScheduler
     {
         public void RunStudy()
         {
-            int sampleCount = 30;
+            int sampleCount = 500;
             var creatorSettings = new CreatorSettings();
             creatorSettings.Length = 1;
             creatorSettings.Nodes = 12;
@@ -29,11 +29,11 @@ namespace SolverScheduler
 
             var rad = Math.PI / 180;
             var resultFactory = new ResultCreator();
-            var Data = resultFactory.EvaluateAngleRange(netList, 3);
+            var Data = resultFactory.EvaluateAngleRange(netList, 1.414);
 
             var csvWritter = new CsvCreator();
 
-            csvWritter.CreateCsv(Data, "dhThreeUnif");
+            csvWritter.CreateCsv(Data, "dhEndRoot");
 
             var meanFlow = Data.Select(x => x.FlowRatioMean);
             var meanAngle = Data.Select(x => x.FlowAngleDeltaMean);

@@ -78,8 +78,8 @@ namespace MainSolver
         // Channel Quantities
         public double[][] hFlow { get; set; }
         public double[][] vFlow { get; set; }
-        public double[][] h_dP { get; set; }
-        public double[][] v_dP { get; set; }
+        public bool[][] h_Blocked { get; set; }
+        public bool[][] v_Blocked { get; set; }
 
         public Network(NetworkSettings sett)
         {
@@ -152,8 +152,8 @@ namespace MainSolver
             residual = new double[N][];
             hFlow = new double[N - 1][];
             vFlow = new double[N][];
-            h_dP = new double[N - 1][];
-            v_dP = new double[N][];
+            h_Blocked = new bool[N - 1][];
+            v_Blocked = new bool[N][];
 
             for (int i = 0; i <= N - 1; i++)
             {
@@ -183,12 +183,12 @@ namespace MainSolver
                 pressure[i] = new double[N];
                 residual[i] = new double[N];
                 vFlow[i] = new double[N - 1];
-                v_dP[i] = new double[N - 1];
+                v_Blocked[i] = new bool[N - 1];
 
                 if (i < N - 1)
                 {
                     hFlow[i] = new double[N];
-                    h_dP[i] = new double[N];
+                    h_Blocked[i] = new bool[N];
                 }
             }
         }
