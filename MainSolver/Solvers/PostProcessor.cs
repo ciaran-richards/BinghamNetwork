@@ -53,25 +53,37 @@ namespace MainSolver.Solvers
                 {
                     for (int j = 1; j < N - 1; j++)
                     {
-                        north = (net.vFlow[i][j] != 0);
-                        south = (net.vFlow[i][j - 1] != 0);
-                        east = (net.hFlow[i][j] != 0);
-                        west = (net.hFlow[i - 1][j] != 0);
+                        north = (!net.v_Blocked[i][j]);
+                        south = (!net.v_Blocked[i][j - 1]);
+                        east = (!net.h_Blocked[i][j]);
+                        west = (!net.h_Blocked[i - 1][j]);
 
                         //If only one channel into a central node has flow, then continuity
                         //is violated, the flowing channel must be halted.
 
                         if (north && !south && !east && !west)
+                        {
                             net.vFlow[i][j] = 0;
+                            net.v_Blocked[i][j] = true;
+                        }
 
                         if (!north && south && !east && !west)
+                        {
                             net.vFlow[i][j - 1] = 0;
+                            net.v_Blocked[i][j-1] = true;
+                        }
 
                         if (!north && !south && east && !west)
+                        {
                             net.hFlow[i][j] = 0;
+                            net.h_Blocked[i][j] = true;
+                        }
 
                         if (!north && !south && !east && west)
+                        {
                             net.hFlow[i - 1][j] = 0;
+                            net.h_Blocked[i-1][j] = true;
+                        }
                     }
                 }
             }
@@ -120,7 +132,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
-                    bGrad[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * 0.5 * net.inv_hLength[i][j] * net.Inv_Yield;
+                    bGrad[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * net.hWidth[i][j] * 0.5 * net.inv_hLength[i][j] * net.Inv_Yield;
                 }
             }
 
@@ -136,7 +148,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    bGrad[i][j] = -(net.pressure[i][j + 1] - net.pressure[i][j]) * 0.5 * net.inv_vLength[i][j] * net.Inv_Yield;
+                    bGrad[i][j] = -(net.pressure[i][j + 1] - net.pressure[i][j]) * net.vWidth[i][j] * 0.5 * net.inv_vLength[i][j] * net.Inv_Yield;
                 }
             }
             return bGrad;

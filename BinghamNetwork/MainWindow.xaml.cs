@@ -19,6 +19,7 @@ namespace NetworkDisplay
         {
             InitializeComponent();
             solverApi = new SolverAPI();
+            UpdateCompareButton();
         }
 
         private void NetworkView_Loaded(object sender, RoutedEventArgs e)
@@ -91,7 +92,9 @@ namespace NetworkDisplay
             if (isNewtonian)
             {
                 var solver = new NewtonianSolver();
-                var net = solver.Solve(selectedNetwork);
+                var net = selectedNetwork.Copy();
+                net.GradPressure = net.GradPressure;
+                net = solver.Solve(net);
                 NetworkRegion.DrawNetwork(net);
                 Name.Text = "Name: " + net.Name;
                 Bingham.Text = "Yield: " + net.YieldPressure;
@@ -105,6 +108,8 @@ namespace NetworkDisplay
             else
             {
                 var solver = new UniformBinghamSolver();
+                solver.MaxRedidual = Math.Pow(10, -6);
+                solver.reg = Math.Pow(10, -9);
                 var postProcessor = new PostProcessor();
                 var net = solver.Solve(selectedNetwork);
                 net = postProcessor.PostProcess(net);

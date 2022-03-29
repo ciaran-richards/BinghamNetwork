@@ -86,7 +86,7 @@ namespace NetworkDisplay
                         polyg.StrokeDashArray = new DoubleCollection() { 2 };
                     }
 
-                    if (network.hFlow[i][j] == 0)
+                    if (network.h_Blocked[i][j])
                     {
                         polyg.StrokeDashArray = new DoubleCollection() { 1 };
                     }
@@ -129,7 +129,7 @@ namespace NetworkDisplay
                         polyg.StrokeDashArray = new DoubleCollection(){2};
                     }
 
-                    if (network.vFlow[i][j] == 0)
+                    if (network.v_Blocked[i][j])
                     {
                         polyg.StrokeDashArray = new DoubleCollection() { 1 };
                     }

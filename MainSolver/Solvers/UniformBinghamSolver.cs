@@ -11,10 +11,12 @@ namespace MainSolver.Solvers
     {
         private DenseMatrix Jacobian;
         //Regularising Constant for iterative solver  
-        private readonly double reg = Math.Pow(10, -5);
+        public double reg = Math.Pow(10, -5);
+        public double MaxRedidual = Math.Pow(10, -4);
 
         public Network Solve(Network net)
         {
+            //returns Null if it does not converge
             double H = net.GradPressure * Math.Cos(net.PressAngle) * net.Length;
             double V = net.GradPressure * Math.Sin(net.PressAngle) * net.Length;
             int N = net.Nodes;
@@ -40,15 +42,12 @@ namespace MainSolver.Solvers
             }
 
             var resVec = new DenseVector((N-1)*(N-1)-1);
-            var correction = new DenseVector((N - 1) * (N - 1) - 1);
-            correction = (DenseVector)resVec.Add(1000);
-            var euclidNorm = 0d;
-
+            DenseVector correction;
             int iteration = 0;
 
 
             //while (correction.Max(x => Math.Abs(x)) / (H + V) > Math.Pow(10, -5))
-            while (net.MaxResidual > Math.Pow(10,-4) || iteration<1)
+            while (net.MaxResidual > MaxRedidual || iteration<1)
             {
                 var hb = HBinghamGrad(net);
                 var vb = VBinghamGrad(net);
@@ -60,10 +59,9 @@ namespace MainSolver.Solvers
                 iteration++;
                 var debug = net.PressAngle * 180 / 3.14;
 
-                if (iteration > 20000)
+                if (iteration > 1000)
                 {
-                    throw new Exception("Unstable Iteration");
-                    int h = 8;
+                    return null;
                 }
                 
 
@@ -135,6 +133,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N; j++)
                 {
+                    net.h_Blocked[i][j] = hBingham[i][j]<1;
                     net.hFlow[i][j] = FlowRate(hBingham[i][j]) * 2 * net.YieldPressure * Math.Pow(net.hWidth[i][j], 2);
                 }
             }
@@ -144,6 +143,7 @@ namespace MainSolver.Solvers
             {
                 for (int j = 0; j < N - 1; j++)
                 {
+                    net.v_Blocked[i][j] = vBingham[i][j]<1;
                     net.vFlow[i][j] = FlowRate(vBingham[i][j]) * 2 * net.YieldPressure * Math.Pow(net.vWidth[i][j], 2);
                 }
             }
@@ -214,9 +214,6 @@ namespace MainSolver.Solvers
             var M = (N - 1) * (N - 1) - 1;
             double[][] rowArrays = new double[M][];
             int u;
-            var invYi = net.Inv_Yield;
-            double diag;
-            var yield = net.YieldPressure;
             //Calculate the Jacobian Matrix
             //Different order to Newtonian Matrix
             //Calculate row-by-row the top-right side of the matrix, but without the diagonals
@@ -328,7 +325,6 @@ namespace MainSolver.Solvers
 
         private double[][] HChannelCoef(Network net)
         {
-            int u;
             int N = net.Nodes;
             var hCoef = new double[N - 1][];
 
@@ -352,7 +348,6 @@ namespace MainSolver.Solvers
 
         private double[][] VChannelCoef(Network net)
         {
-            int u;
             int N = net.Nodes;
             double[][] vCoef = new double[N][];
             for (int i = 0; i <= N - 1; i++)
