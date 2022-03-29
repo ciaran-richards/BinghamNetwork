@@ -232,8 +232,6 @@ namespace MainSolver
             double VertFlow = 0;
             double HorizFlow = 0;
             double angleRad;
-            double dy;
-            double dx;
 
             // Horizontal Channels
             for (int i = 0; i < N - 1; i++)

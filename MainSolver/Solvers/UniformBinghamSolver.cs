@@ -42,10 +42,7 @@ namespace MainSolver.Solvers
             }
 
             var resVec = new DenseVector((N-1)*(N-1)-1);
-            var correction = new DenseVector((N - 1) * (N - 1) - 1);
-            correction = (DenseVector)resVec.Add(1000);
-            var euclidNorm = 0d;
-
+            DenseVector correction;
             int iteration = 0;
 
 
@@ -217,9 +214,6 @@ namespace MainSolver.Solvers
             var M = (N - 1) * (N - 1) - 1;
             double[][] rowArrays = new double[M][];
             int u;
-            var invYi = net.Inv_Yield;
-            double diag;
-            var yield = net.YieldPressure;
             //Calculate the Jacobian Matrix
             //Different order to Newtonian Matrix
             //Calculate row-by-row the top-right side of the matrix, but without the diagonals
@@ -331,7 +325,6 @@ namespace MainSolver.Solvers
 
         private double[][] HChannelCoef(Network net)
         {
-            int u;
             int N = net.Nodes;
             var hCoef = new double[N - 1][];
 
@@ -355,7 +348,6 @@ namespace MainSolver.Solvers
 
         private double[][] VChannelCoef(Network net)
         {
-            int u;
             int N = net.Nodes;
             double[][] vCoef = new double[N][];
             for (int i = 0; i <= N - 1; i++)

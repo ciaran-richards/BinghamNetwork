@@ -27,7 +27,6 @@ namespace SolverScheduler
 
             var netList = netFactory.NetworkList(creatorSettings, sampleCount);
 
-            var rad = Math.PI / 180;
             var resultFactory = new ResultCreator();
             var Data = resultFactory.EvaluateAngleRange(netList, 1.414);
 
