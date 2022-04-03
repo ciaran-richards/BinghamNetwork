@@ -8,7 +8,7 @@ using MainSolver.Solvers;
 
 namespace SolverScheduler
 {
-    class ResultCreator
+    class IsoResultCreator
     {
 
         private NetworkCreator NetworkCreator;
@@ -17,12 +17,12 @@ namespace SolverScheduler
         private const double Rad = Math.PI / 180;
         private const int MaxAngle = 45;
 
-        public List<ResultStruct> EvaluateAngleRange(Network[] Networks, double pGrad)
+        public List<IsoResultStruct> EvaluateAngleRange(Network[] Networks, double pGrad)
         {
             
             double angle;
-            var ResultRange = new List<ResultStruct>(MaxAngle+1);
-            for (double i = MaxAngle; i >= 27; i = i-1.5d)
+            var ResultRange = new List<IsoResultStruct>(MaxAngle+1);
+            for (double i = MaxAngle; i >= 0; i = i-1.5d)
             {
                 angle = i * Rad;
                 ResultRange.Add(Evaluate(Networks, pGrad, angle));
@@ -31,7 +31,7 @@ namespace SolverScheduler
             return ResultRange;
         }
 
-        public ResultStruct Evaluate(Network[] Networks, double pGrad, double pAngle)
+        public IsoResultStruct Evaluate(Network[] Networks, double pGrad, double pAngle)
         {
             var BinghamSolver = new UniformBinghamSolver();
             var NewtonSolver = new NewtonianSolver();
@@ -113,7 +113,7 @@ namespace SolverScheduler
                 angleSD = Math.Sqrt(angleSumSquares / (AngleSamples - 1));
             }
             
-            var result = new ResultStruct();
+            var result = new IsoResultStruct();
             result.BinghamGradient = pGrad / (2 * YieldPressure);
             result.BinghamGradAngle = pAngle * Deg;
             result.FlowRatioMean = flowMean;

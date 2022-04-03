@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SolverScheduler
 { 
-    struct ResultStruct
+    struct IsoResultStruct
     {
         public double BinghamGradient { get; set; }
         public double BinghamGradAngle { get; set; }
