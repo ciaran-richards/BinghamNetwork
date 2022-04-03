@@ -13,7 +13,7 @@ namespace SolverScheduler
     class CsvCreator
     {
 
-        public bool CreateCsv(List<ResultStruct> results, string name)
+        public bool CreateCsv(List<IsoResultStruct> results, string name)
         {
 
             string filePath = Paths.Results + "\\" + name + ".csv"; 

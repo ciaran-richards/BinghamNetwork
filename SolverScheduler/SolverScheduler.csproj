@@ -69,11 +69,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CsvCreator.cs" />
+    <Compile Include="FlowResultStruct.cs" />
     <Compile Include="NetworkListMaker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResultCreator.cs" />
-    <Compile Include="ResultStruct.cs" />
+    <Compile Include="IsoResultCreator.cs" />
+    <Compile Include="IsoResultStruct.cs" />
     <Compile Include="StudyRunner.cs" />
   </ItemGroup>
   <ItemGroup>

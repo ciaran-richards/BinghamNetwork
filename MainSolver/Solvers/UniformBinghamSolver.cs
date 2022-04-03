@@ -59,7 +59,7 @@ namespace MainSolver.Solvers
                 iteration++;
                 var debug = net.PressAngle * 180 / 3.14;
 
-                if (iteration > 1000)
+                if (iteration > 200)
                 {
                     return null;
                 }
