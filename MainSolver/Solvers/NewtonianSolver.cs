@@ -190,7 +190,6 @@ namespace MainSolver
             {
                 for (int j = 0; j < N; j++)
                 {
-                    
                     hCoef[i][j] = net.inv_hLength[i][j]*Math.Pow(net.hWidth[i][j],3);
                 }
             }

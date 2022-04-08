@@ -22,7 +22,7 @@ namespace SolverScheduler
             
             double angle;
             var ResultRange = new List<IsoResultStruct>(MaxAngle+1);
-            for (double i = MaxAngle; i >= 0; i = i-1.5d)
+            for (double i = MaxAngle; i >= 0; i = i-45)
             {
                 angle = i * Rad;
                 ResultRange.Add(Evaluate(Networks, pGrad, angle));

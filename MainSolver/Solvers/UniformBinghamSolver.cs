@@ -64,7 +64,8 @@ namespace MainSolver.Solvers
                     return null;
                 }
                 
-
+                Console.WriteLine(iteration);
+                Console.WriteLine(net.MaxResidual);
             }
             net.CalculateBulkFlow();
 

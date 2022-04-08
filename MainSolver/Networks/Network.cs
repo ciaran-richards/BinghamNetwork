@@ -267,5 +267,44 @@ namespace MainSolver
             return (Network) this.MemberwiseClone();
         }
 
+        public Network CopyNoWidth()
+        {
+            var net = (Network)this.MemberwiseClone();
+            var N = net.Nodes;
+            net.hWidth = new double[N - 1][];
+            net.vWidth = new double[N][];
+
+            for (int i = 0; i <= N - 1; i++)
+            {
+                net.vWidth[i] = new double[N - 1];
+            }
+
+            for (int i = 0; i < N - 1; i++)
+            {
+                net.hWidth[i] = new double[N];
+                for (int j = 0; j < N - 1; j++)
+                {
+                    net.vWidth[i][j] = 1;
+                    net.hWidth[i][j] = 1;
+                }
+                net.hWidth[i][N - 1] = net.hWidth[i][0];
+                net.vWidth[N - 1][i] = net.vWidth[0][i];
+            }
+            
+            return net;
+        }
+
+        public Network CopyNoDepth()
+        {
+            var net = (Network) this.MemberwiseClone();
+            var N = net.Nodes;
+            net.dz = new double[N][];
+            for (int i = 0; i <= N - 1; i++)
+            {
+                net.dz[i] = new double[N];
+            }
+            return net;
+        }
+
     }
 }
