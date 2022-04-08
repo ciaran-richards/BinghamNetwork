@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using MainSolver;
@@ -53,12 +54,12 @@ namespace NetworkDisplay
             
             sett.Name = "Hi";
             sett.Nodes = nods;
-            sett.DisplacementDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal;
-            sett.WidthDistro = CheckBox.IsChecked.Value ? Distro.Uniform : Distro.Normal; 
+            sett.DisplacementDistro = IsUniform.IsChecked.Value ? Distro.Uniform : Distro.Normal;
+            sett.WidthDistro = IsUniform.IsChecked.Value ? Distro.Uniform : Distro.Normal;
             sett.Length = 1;
             sett.DisplacementLimit = displacePerc;
-            sett.dzLimit = 0;
-            sett.WidthDevLimit = 1;
+            sett.dzLimit = displacePerc;
+            sett.WidthDevLimit = displacePerc;
             
             var net = solverApi.CreateNetwork(sett);
             net.YieldPressure = 0.5;
@@ -89,21 +90,17 @@ namespace NetworkDisplay
 
         private void UpdateCanvas()
         {
+            var net = selectedNetwork.Copy();
+            if (!HasDepth.IsChecked.Value)
+                net = net.CopyNoDepth();
+            if (!HasWidth.IsChecked.Value)
+                net = net.CopyNoWidth();
+            net.GradPressure = net.GradPressure;
+
             if (isNewtonian)
             {
                 var solver = new NewtonianSolver();
-                var net = selectedNetwork.Copy();
-                net.GradPressure = net.GradPressure;
                 net = solver.Solve(net);
-                NetworkRegion.DrawNetwork(net);
-                Name.Text = "Name: " + net.Name;
-                Bingham.Text = "Yield: " + net.YieldPressure;
-                Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
-                FlowRate.Text = "FlowRate: " + net.FlowRate;
-                FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
-                PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
-                PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
-                MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
             }
             else
             {
@@ -111,19 +108,18 @@ namespace NetworkDisplay
                 solver.MaxRedidual = Math.Pow(10, -6);
                 solver.reg = Math.Pow(10, -9);
                 var postProcessor = new PostProcessor();
-                var net = solver.Solve(selectedNetwork);
-                net = postProcessor.PostProcess(net);
-                NetworkRegion.DrawNetwork(net);
-                Name.Text = "Name: " + net.Name;
-                Bingham.Text = "Yield: " + net.YieldPressure;
-                Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
-                FlowRate.Text = "FlowRate: " + net.FlowRate;
-                FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
-                PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
-                PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
-                MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+                net = solver.Solve(net);
+                //net = postProcessor.PostProcess(net);
             }
-
+            NetworkRegion.DrawNetwork(net);
+            Name.Text = "Name: " + net.Name;
+            Bingham.Text = "Yield: " + net.YieldPressure;
+            Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
+            FlowRate.Text = "FlowRate: " + net.FlowRate;
+            FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
+            PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
+            PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
+            MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
         }
 
 
@@ -150,6 +146,17 @@ namespace NetworkDisplay
 
             PressureAngle.Text = Math.Round(selectedNetwork.PressAngle, 5).ToString();
             UpdateCanvas();
+        }
+
+
+        private void HasWidth_OnClick(object sender, RoutedEventArgs e)
+        {
+            UpdateCanvas();
+        }
+
+        private void HasDepth_OnClick(object sender, RoutedEventArgs e)
+        {
+           UpdateCanvas();
         }
     }
 }

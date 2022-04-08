@@ -12,15 +12,15 @@ namespace SolverScheduler
     {
         public void RunStudy()
         {
-            int sampleCount = 200;
+            int sampleCount = 3;
             var creatorSettings = new CreatorSettings();
             creatorSettings.Length = 1;
-            creatorSettings.Nodes = 12;
+            creatorSettings.Nodes = 70;
             creatorSettings.DisplacementDistro = Distro.Uniform;
             creatorSettings.DisplacementLimit = 1;
-            creatorSettings.dzLimit = 1;
+            creatorSettings.dzLimit = 0;
             creatorSettings.WidthDistro = Distro.Uniform;
-            creatorSettings.WidthDevLimit = 0;
+            creatorSettings.WidthDevLimit = 1;
 
 
             var netFactory = new NetworkListMaker();
@@ -28,11 +28,11 @@ namespace SolverScheduler
             var netList = netFactory.NetworkList(creatorSettings, sampleCount);
 
             var resultFactory = new IsoResultCreator();
-            var Data = resultFactory.EvaluateAngleRange(netList, 3);
+            var Data = resultFactory.EvaluateAngleRange(netList, 1.1);
 
             var csvWritter = new CsvCreator();
 
-            csvWritter.CreateCsv(Data, "dzThree4");
+            csvWritter.CreateCsv(Data, "Network_70_PointOne_1");
 
             var meanFlow = Data.Select(x => x.FlowRatioMean);
             var meanAngle = Data.Select(x => x.FlowAngleDeltaMean);
