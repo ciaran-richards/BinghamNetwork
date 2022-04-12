@@ -25,15 +25,17 @@
             <TextBlock Text="Displacement"/>
             <TextBox Background="GhostWhite" x:Name="DisplaceText" Text="1"/>
             <TextBlock Text="Nodes"/>
-            <TextBox Background="GhostWhite" x:Name="NodesText" Text="8"/>
+            <TextBox Background="GhostWhite" x:Name="NodesText" Text="12"/>
             <TextBlock Text="Pressure Gradient" FontSize="25"/>
             <TextBox Background="GhostWhite" x:Name="PGrad" Text="1.1" FontSize="25"/>
             <TextBlock Text="PressureAngle"/>
-            <TextBox Background="GhostWhite" x:Name="PAngle" Text="6"/>
+            <TextBox Background="GhostWhite" x:Name="PAngle" Text="45"/>
+            <TextBlock Text="Shear Index"/>
+            <TextBox Background="GhostWhite" x:Name="SIndex" Text="1"/>
             <Button x:Name="CompareButton" Content="Newtonian" Click="ChangeDisplay_OnClick"/>
             <CheckBox x:Name="IsUniform" Content="Uniform" IsChecked="True"/>
             <CheckBox x:Name="HasWidth" Content="Width Variation" IsChecked="True" Click="HasWidth_OnClick"/>
-            <CheckBox x:Name="HasDepth" Content="Depth Variation" IsChecked="True" Click="HasDepth_OnClick"/>
+            <CheckBox x:Name="HasDepth" Content="Depth Variation" IsChecked="False" Click="HasDepth_OnClick"/>
 
         </StackPanel>
         <local:NetworkView Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" x:Name="NetworkRegion" Loaded="NetworkView_Loaded"

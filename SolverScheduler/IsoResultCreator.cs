@@ -33,7 +33,7 @@ namespace SolverScheduler
 
         public IsoResultStruct Evaluate(Network[] Networks, double pGrad, double pAngle)
         {
-            var BinghamSolver = new UniformBinghamSolver();
+            var BinghamSolver = new BinghamSolver();
             var NewtonSolver = new NewtonianSolver();
             int Count = Networks.Length;
             //If Flow is Zero, the Angle is Not A Number, exclude from all processing. 

@@ -13,6 +13,8 @@ namespace MainSolver
         private double inv_yieldPressure = 1;
         private double gradPressure;
         private double pressAngle;
+        private double shearIndex = 1;
+
 
         public string Name { get; set; }
         public int Nodes { get; private set; } //
@@ -51,6 +53,18 @@ namespace MainSolver
                 ResetVariables();
             }
         }//
+
+
+        public double ShearIndex
+        {
+            get { return shearIndex; }
+            set
+            {
+                shearIndex = value;
+                ResetVariables();
+            }
+        }//
+
         public double FlowRate { get; private set; }
         public double FlowAngle { get; private set; }
         public double MaxResidual { get; private set; }
@@ -223,6 +237,19 @@ namespace MainSolver
 
             AveResidual = residual.Average(x => x.Average(y=> Math.Abs(y)));
             MaxResidual = residual.Max(x => x.Max(y => Math.Abs(y)));
+            //string debug;
+            //for (int i = 0; i < N - 1; i++)
+            //{
+            //    for (int j = 0; j < N - 1; j++)
+            //    {
+            //        if (Math.Abs(residual[i][j]) == MaxResidual)
+            //        {
+            //            debug = $" at {i} + {j}||";
+            //            Console.Write(debug);
+            //        }
+
+            //    }
+            //}
 
         }
 

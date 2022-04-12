@@ -15,7 +15,7 @@ namespace SolverScheduler
             int sampleCount = 3;
             var creatorSettings = new CreatorSettings();
             creatorSettings.Length = 1;
-            creatorSettings.Nodes = 70;
+            creatorSettings.Nodes = 60;
             creatorSettings.DisplacementDistro = Distro.Uniform;
             creatorSettings.DisplacementLimit = 1;
             creatorSettings.dzLimit = 0;
