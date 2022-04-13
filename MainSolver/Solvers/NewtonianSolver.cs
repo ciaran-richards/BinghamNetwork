@@ -46,7 +46,7 @@ namespace MainSolver
             {
                 for (int j = 0; j < N; j++)
                 {
-                    net.hFlow[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * hCoef[i][j];
+                    net.hFlow[i][j] = -(net.pressure[i + 1][j] - net.pressure[i][j]) * hCoef[i][j] / 12;
                 }
             } 
             //Calculate vertical flow
@@ -54,7 +54,7 @@ namespace MainSolver
             {
                 for (int j = 0; j < N - 1; j++)
                 {
-                    net.vFlow[i][j] = -(net.pressure[i][j+1] - net.pressure[i][j]) * vCoef[i][j];
+                    net.vFlow[i][j] = -(net.pressure[i][j+1] - net.pressure[i][j]) * vCoef[i][j] / 12;
                 }
             }
             

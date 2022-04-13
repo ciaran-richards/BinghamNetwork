@@ -85,7 +85,7 @@ namespace NetworkDisplay
 
         private void UpdateCompareButton()
         {
-            CompareButton.Content = isNewtonian ? "Newtonian" : "Bingham";
+            CompareButton.Content = isNewtonian ? "Newtonian/Indexed" : "Bingham/PseudoPlastic";
             var colour = isNewtonian ? Colors.LightBlue : Colors.LightGreen;
             CompareButton.Background = new SolidColorBrush(colour);
         }
@@ -108,12 +108,22 @@ namespace NetworkDisplay
 
             if (isNewtonian)
             {
-                var solver = new NewtonianSolver();
-                net = solver.Solve(net);
+                if (Math.Abs(net.ShearIndex - 1) < 0.0001)
+                {
+                    var solver = new NewtonianSolver();
+                    net = solver.Solve(net);
+                }
+                else
+                {
+                    var solver = new ShearIndexSolver();
+                    net.YieldPressure = 0d;
+                    solver.MaxRedidual = Math.Pow(10, -6);
+                    net = solver.Solve(net);
+                }
             }
             else
             {
-                var solver = new BinghamSolver();
+                var solver = new HerschelBulkleySolver();
                 solver.MaxRedidual = Math.Pow(10, -6);
                 solver.reg = Math.Pow(10, -9);
                 var postProcessor = new PostProcessor();
@@ -147,24 +157,6 @@ namespace NetworkDisplay
             UpdateCanvas();
         }
 
-    
-
-        private void NetworkRegion_OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.W || e.Key == Key.Up)
-            {
-                selectedNetwork.PressAngle += 2 * Math.PI / 180;
-            }
-
-            if (e.Key == Key.S || e.Key == Key.Down)
-            {
-                selectedNetwork.PressAngle -= 2 * Math.PI / 180;
-            }
-
-            PressureAngle.Text = Math.Round(selectedNetwork.PressAngle, 5).ToString();
-            UpdateCanvas();
-        }
-
 
         private void HasWidth_OnClick(object sender, RoutedEventArgs e)
         {
@@ -174,6 +166,40 @@ namespace NetworkDisplay
         private void HasDepth_OnClick(object sender, RoutedEventArgs e)
         {
            UpdateCanvas();
+        }
+
+        private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
+        {
+
+            if (e.Key == Key.Up)
+            {
+                selectedNetwork.PressAngle  += 5 * Math.PI / 180;
+                PAngle.Text = Math.Round(selectedNetwork.PressAngle * 180 / Math.PI, 5).ToString();
+                UpdateCanvas();
+            }
+
+            if (e.Key == Key.Down)
+            {
+                selectedNetwork.PressAngle -= 5 * Math.PI / 180;
+                PAngle.Text = Math.Round(selectedNetwork.PressAngle * 180 / Math.PI, 5).ToString();
+                UpdateCanvas();
+            }
+
+            if (e.Key == Key.OemCloseBrackets)
+            {
+                selectedNetwork.ShearIndex += 0.1;
+                SIndex.Text = Math.Round(selectedNetwork.ShearIndex, 5).ToString();
+                UpdateCanvas();
+            }
+
+            if (e.Key == Key.OemOpenBrackets)
+            {
+                selectedNetwork.ShearIndex -= 0.1;
+                SIndex.Text = Math.Round(selectedNetwork.ShearIndex, 5).ToString();
+                UpdateCanvas();
+            }
+
+
         }
     }
 }

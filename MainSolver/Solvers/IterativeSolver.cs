@@ -14,6 +14,7 @@ namespace MainSolver.Solvers
         public double reg = Math.Pow(10, -5);
         public double MaxRedidual = Math.Pow(10, -4);
         public double MinDerivative = Math.Pow(10, -3);
+        public double MaxIterations = 30;
 
         public Network Solve(Network net)
         {
@@ -57,14 +58,13 @@ namespace MainSolver.Solvers
                 iteration++;
                 var debug = net.PressAngle * 180 / 3.14;
 
-                if (iteration > 200)
+                if (iteration > MaxIterations)
                 {
                     return null;
                 }
-                
-                Console.WriteLine(iteration);
-                Console.WriteLine("Max:" + net.MaxResidual);
-                Console.WriteLine("Ave:" + net.AveResidual);
+                //Console.WriteLine(iteration);
+                //Console.WriteLine("Max:" + net.MaxResidual);
+                //Console.WriteLine("Ave:" + net.AveResidual);
             }
             net.CalculateBulkFlow();
 
@@ -97,26 +97,29 @@ namespace MainSolver.Solvers
                         if (p < N - 2)
                         {
                             //Derivative wrt RH node Pressure - Except Right Bound.
-                            row[u + 1] = FlowDerivative(hdP[p][q], net.hWidth[p][q], net.inv_hLength[p][q], yield);
+                            row[u + 1] = 
+                                FlowDerivative(hdP[p][q], net.hWidth[p][q], net.inv_hLength[p][q], yield, net.ShearIndex);
 
                         }
 
                         if (p == 0 && q > 0)
                         {
                             //Derivative wrt RH node Pressure - Right Bound
-                            row[u + (N - 2)] = FlowDerivative(hdP[N - 2][q], net.hWidth[N - 2][q], net.inv_hLength[N - 2][q], yield);
+                            row[u + (N - 2)] = 
+                                FlowDerivative(hdP[N - 2][q], net.hWidth[N - 2][q], net.inv_hLength[N - 2][q], yield, net.ShearIndex);
                         }
 
                         if (u + N - 1 < M)
                         {  //Derivative wrt Upper node Pressure - Except Top Bound
-                            row[u + N - 1] = FlowDerivative(vdP[p][q], net.vWidth[p][q], net.inv_vLength[p][q], yield);
+                            row[u + N - 1] = 
+                                FlowDerivative(vdP[p][q], net.vWidth[p][q], net.inv_vLength[p][q], yield, net.ShearIndex);
                         }
 
                         if (u + (N - 2) * (N - 1) < M)
                         {
                             //Derivative wrt top node pressure on it's column - Bottom Bound only
                             row[u + (N - 2) * (N - 1)] =
-                                FlowDerivative(vdP[p][N - 2], net.vWidth[p][N - 2], net.inv_vLength[p][N - 2], yield);
+                                FlowDerivative(vdP[p][N - 2], net.vWidth[p][N - 2], net.inv_vLength[p][N - 2], yield, net.ShearIndex);
                         }
                         rowArrays[u] = row;
                     }
@@ -134,24 +137,24 @@ namespace MainSolver.Solvers
             }
 
             //Add boundary conditions four diagonal terms
-            Jacobian[0, 0] = Jacobian[0, 0] - FlowDerivative(hdP[0][0], net.hWidth[0][0], net.inv_hLength[0][0], yield);
+            Jacobian[0, 0] = Jacobian[0, 0] - 
+                             FlowDerivative(hdP[0][0], net.hWidth[0][0], net.inv_hLength[0][0], yield, net.ShearIndex);
 
             Jacobian[N - 2, N - 2] = Jacobian[N - 2, N - 2] -
-                                     FlowDerivative(vdP[0][0], net.vWidth[0][0], net.inv_vLength[0][0], yield);
+                                     FlowDerivative(vdP[0][0], net.vWidth[0][0], net.inv_vLength[0][0], yield, net.ShearIndex);
 
             Jacobian[N - 3, N - 3] = Jacobian[N - 3, N - 3] -
-                                     FlowDerivative(hdP[N - 2][0], net.hWidth[N - 2][0], net.inv_hLength[N - 2][0], yield);
+                                     FlowDerivative(hdP[N - 2][0], net.hWidth[N - 2][0], net.inv_hLength[N - 2][0], yield, net.ShearIndex);
 
             u = (N - 1) * (N - 2) - 1;
             Jacobian[u, u] = Jacobian[u, u] -
-                             FlowDerivative(vdP[0][N - 2], net.vWidth[0][N - 2], net.inv_hLength[0][N - 2], yield);
+                             FlowDerivative(vdP[0][N - 2], net.vWidth[0][N - 2], net.inv_hLength[0][N - 2], yield, net.ShearIndex);
             
 
             var resVec = ResidualVector(net);
 
-            var invJac = Jacobian.Inverse();
 
-            var pressureCorrect = (DenseVector)invJac.Multiply(-resVec);
+            var pressureCorrect = Jacobian.Solve(-resVec);
 
             return (DenseVector)pressureCorrect;
         }
@@ -165,7 +168,7 @@ namespace MainSolver.Solvers
                 for (int j = 0; j < N; j++)
                 {
                     net.h_Blocked[i][j] = hPGrad[i][j]*net.hWidth[i][j]*0.5*net.Inv_Yield<1;
-                    net.hFlow[i][j] = FlowRate(hPGrad[i][j], net.hWidth[i][j], net.YieldPressure);
+                    net.hFlow[i][j] = FlowRate(hPGrad[i][j], net.hWidth[i][j], net.YieldPressure, net.ShearIndex);
                 }
             }
 
@@ -175,15 +178,15 @@ namespace MainSolver.Solvers
                 for (int j = 0; j < N - 1; j++)
                 {
                     net.v_Blocked[i][j] = vPGrad[i][j]*net.vWidth[i][j]*0.5*net.Inv_Yield<1;
-                    net.vFlow[i][j] = FlowRate(vPGrad[i][j], net.vWidth[i][j], net.YieldPressure);
+                    net.vFlow[i][j] = FlowRate(vPGrad[i][j], net.vWidth[i][j], net.YieldPressure, net.ShearIndex);
                 }
             }
 
         }
 
-        public abstract double FlowRate(double pGrad, double width, double yield);
+        public abstract double FlowRate(double pGrad, double width, double yield, double index);
 
-        public abstract double FlowDerivative(double pGrad, double width, double invLength, double yield);
+        public abstract double FlowDerivative(double pGrad, double width, double invLength, double yield, double index);
 
         //Helper Methods Below
 

@@ -9,10 +9,10 @@ namespace MainSolver.Solvers
 {
     public class BinghamSolver : IterativeSolver
     {
-        public override double FlowRate(double pGrad, double width, double yield)
+        public override double FlowRate(double pGrad, double width, double yield, double index)
         {
             var binghamGrad = pGrad * width * 0.5 / yield;
-            return NDFlowRate(binghamGrad) * 2 * yield * Math.Pow(width, 2);
+            return NDFlowRate(binghamGrad) * 2 * yield * Math.Pow(width, 2) / 12;
         }
 
         double NDFlowRate(double binghamGradient)
@@ -33,7 +33,7 @@ namespace MainSolver.Solvers
             return binghamGradient * planeFlowFunc;
         }
 
-        public override double FlowDerivative(double pGrad, double width, double invLength, double yield)
+        public override double FlowDerivative(double pGrad, double width, double invLength, double yield, double index)
         {
             var binghamGrad = pGrad * width * 0.5 / yield;
             var derivative = NDFlowDerivative(binghamGrad) * Math.Pow(width, 3) * invLength;
@@ -42,8 +42,8 @@ namespace MainSolver.Solvers
             //Now with Finite Difference
 
             var delta = Math.Pow(10, -5);
-            var flow0 = FlowRate(pGrad, width, yield);
-            var flow1 = FlowRate(pGrad + delta, width, yield);
+            var flow0 = FlowRate(pGrad, width, yield, index);
+            var flow1 = FlowRate(pGrad + delta, width, yield, index);
             var fdDerivative = (flow1 - flow0) / delta;
             fdDerivative = Math.Max(fdDerivative, MinDerivative);
             fdDerivative = fdDerivative * invLength;
