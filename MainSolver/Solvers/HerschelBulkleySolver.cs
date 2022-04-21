@@ -19,11 +19,6 @@ namespace MainSolver.Solvers
             var binghamGrad = pGrad * width * 0.5 / yield;
             var flow = shearIndexFlow * PlaneFlowFunction(binghamGrad, index);
 
-            if (double.IsNaN(flow))
-            {
-                return 0;
-            }
-
             return flow;
         }
 
@@ -46,12 +41,6 @@ namespace MainSolver.Solvers
             var fdDerivative = (flow1 - flow0) / delta;
             fdDerivative = Math.Max(fdDerivative, MinDerivative);
             fdDerivative = fdDerivative * invLength;
-
-            if (double.IsNaN(fdDerivative))
-            {
-                return 0;
-            }
-
             return fdDerivative;
         }
     }

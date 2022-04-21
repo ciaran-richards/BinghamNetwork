@@ -14,7 +14,7 @@ namespace MainSolver.Solvers
         public double reg = Math.Pow(10, -5);
         public double MaxRedidual = Math.Pow(10, -4);
         public double MinDerivative = Math.Pow(10, -3);
-        public double MaxIterations = 30;
+        public double MaxIterations = 40;
 
         public Network Solve(Network net)
         {
@@ -54,6 +54,12 @@ namespace MainSolver.Solvers
                 net.CalculateResiduals();
                 resVec = ResidualVector(net);
                 correction = PressureCorrection(net, hpGrad, vpGrad);
+
+                if (correction == null)
+                {
+                    return null;
+                }
+
                 ApplyCorrection(ref net, correction);
                 iteration++;
                 var debug = net.PressAngle * 180 / 3.14;
@@ -66,8 +72,8 @@ namespace MainSolver.Solvers
                 //Console.WriteLine("Max:" + net.MaxResidual);
                 //Console.WriteLine("Ave:" + net.AveResidual);
             }
-            net.CalculateBulkFlow();
 
+            net.CalculateBulkFlow();
             return net;
         }
 
@@ -152,7 +158,10 @@ namespace MainSolver.Solvers
             
 
             var resVec = ResidualVector(net);
-
+            if (resVec.Any(x => (Math.Abs(x)>Math.Pow(10,20)*(Math.Abs(net.GradPressure))) || double.IsNaN(x)))
+            {
+                return null;
+            }
 
             var pressureCorrect = Jacobian.Solve(-resVec);
 

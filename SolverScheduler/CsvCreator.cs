@@ -28,12 +28,30 @@ namespace SolverScheduler
             catch (Exception e)
             {
                 throw e;
-                return false;
             }
 
             return true;
         }
 
+        public bool CreateCsv(List<FlowResultStruct> results, string name)
+        {
+
+            string filePath = Paths.Results + "\\" + name + ".csv";
+            try
+            {
+                using (TextWriter writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
+                {
+                    var csv = new CsvWriter(writer, CultureInfo.CurrentCulture);
+                    csv.WriteRecords(results); // where values implements IEnumerable
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return true;
+        }
 
     }
 }

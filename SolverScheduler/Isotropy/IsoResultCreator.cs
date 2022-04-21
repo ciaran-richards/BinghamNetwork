@@ -15,14 +15,14 @@ namespace SolverScheduler
 
         private const double Deg = 180 / Math.PI;
         private const double Rad = Math.PI / 180;
-        private const int MaxAngle = 45;
+        private const int MaxAngle = 90;
 
         public List<IsoResultStruct> EvaluateAngleRange(Network[] Networks, double pGrad, double index)
         {
             
             double angle;
             var ResultRange = new List<IsoResultStruct>(MaxAngle+1);
-            for (double i = MaxAngle; i >= 0; i = i-1.5)
+            for (double i = MaxAngle; i >= 0; i = i-3)
             {
                 angle = i * Rad;
                 ResultRange.Add(Evaluate(Networks, pGrad, angle, index));
@@ -37,6 +37,7 @@ namespace SolverScheduler
             var BinghamSolver = new BinghamSolver();
             var SIndSolver = new ShearIndexSolver();
             var NewtonSolver = new NewtonianSolver();
+
             int Count = Networks.Length;
             //If Flow is Zero, the Angle is Not A Number, exclude from all processing. 
             double YieldPressure = 0.5;
@@ -61,6 +62,8 @@ namespace SolverScheduler
                 newtonNet = NewtonSolver.Solve(Networks[i].Copy());
                 hbNet = HBSolver.Solve(Networks[i].Copy());
 
+
+
                 if (Math.Abs(index - 1) < 0.000000001)
                 {
                     sindNet = newtonNet;
@@ -69,8 +72,6 @@ namespace SolverScheduler
                 {
                     sindNet = SIndSolver.Solve(Networks[i].Copy());
                 }
-
-
 
                 if (hbNet != null && sindNet!=null)
                 {

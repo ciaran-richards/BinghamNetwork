@@ -169,7 +169,7 @@ namespace MainSolver
             double H = net.GradPressure * Math.Cos(net.PressAngle);
             double V = net.GradPressure * Math.Sin(net.PressAngle);
 
-            var pressureVec = A.Inverse().Multiply(H * B + V * C);
+            var pressureVec = A.Solve(H * B + V * C);
 
             return pressureVec;
         }

@@ -124,18 +124,15 @@ namespace NetworkDisplay
             else
             {
                 var solver = new HerschelBulkleySolver();
-                solver.MaxRedidual = Math.Pow(10, -6);
-                solver.reg = Math.Pow(10, -9);
-                var postProcessor = new PostProcessor();
+                solver.MaxRedidual = Math.Pow(10, -5);
+                solver.reg = Math.Pow(10, -7);
+                //var postProcessor = new PostProcessor();
                 net = solver.Solve(net);
 
                 //net = postProcessor.PostProcess(net);
             }
 
-            if(net == null)
-                NewNetworkRequest();
-
-            else
+            if(net != null)
             {
                 NetworkRegion.DrawNetwork(net);
                 Name.Text = "Name: " + net.Name;
@@ -146,6 +143,11 @@ namespace NetworkDisplay
                 PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
                 PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
                 MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+            }
+            else
+            {
+                NetworkRegion.DrawNetwork(selectedNetwork);
+                Name.Text = "Complete";
             }
         }
 
