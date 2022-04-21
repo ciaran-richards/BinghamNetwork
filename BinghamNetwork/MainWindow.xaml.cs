@@ -28,17 +28,25 @@ namespace NetworkDisplay
 
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e) => NewNetworkRequest();
+
+        private void NewNetworkRequest()
         {
             var displaceText = DisplaceText.Text;
             double displacePerc = 0;
 
             var nodeText = NodesText.Text;
             int nods = 3;
+            double shearIndex = 1;
+            double pGrad = 1;
+            double pangle = 1;
             try
             {
                 displacePerc = double.Parse(displaceText);
                 nods = int.Parse(nodeText);
+                shearIndex = double.Parse(SIndex.Text);
+                pGrad = double.Parse(PGrad.Text);
+                pangle = double.Parse(PAngle.Text) * Math.PI / 180;
             }
             //Do Nothing
             catch { }
@@ -48,10 +56,12 @@ namespace NetworkDisplay
                 nods = 3;
             }
 
+
+
             var settings = new CreatorSettings();
             var networkCreator = new NetworkCreator();
             var sett = new CreatorSettings();
-            
+
             sett.Name = "Hi";
             sett.Nodes = nods;
             sett.DisplacementDistro = IsUniform.IsChecked.Value ? Distro.Uniform : Distro.Normal;
@@ -60,23 +70,22 @@ namespace NetworkDisplay
             sett.DisplacementLimit = displacePerc;
             sett.dzLimit = displacePerc;
             sett.WidthDevLimit = displacePerc;
-            
+
             var net = solverApi.CreateNetwork(sett);
+
+            net.GradPressure = pGrad;
+            net.PressAngle = pangle;
+
+            net.ShearIndex = shearIndex;
             net.YieldPressure = 0.5;
-            try
-            {
-                net.GradPressure = double.Parse(PGrad.Text);
-                net.PressAngle = double.Parse(PAngle.Text)*Math.PI/180;
-            }
-            catch(Exception exception)
-            {}
+            
             selectedNetwork = net;
-           UpdateCanvas();
+            UpdateCanvas();
         }
 
         private void UpdateCompareButton()
         {
-            CompareButton.Content = isNewtonian ? "Newtonian" : "Bingham";
+            CompareButton.Content = isNewtonian ? "Newtonian/Indexed" : "Bingham/PseudoPlastic";
             var colour = isNewtonian ? Colors.LightBlue : Colors.LightGreen;
             CompareButton.Background = new SolidColorBrush(colour);
         }
@@ -99,27 +108,47 @@ namespace NetworkDisplay
 
             if (isNewtonian)
             {
-                var solver = new NewtonianSolver();
-                net = solver.Solve(net);
+                if (Math.Abs(net.ShearIndex - 1) < 0.0001)
+                {
+                    var solver = new NewtonianSolver();
+                    net = solver.Solve(net);
+                }
+                else
+                {
+                    var solver = new ShearIndexSolver();
+                    net.YieldPressure = 0d;
+                    solver.MaxRedidual = Math.Pow(10, -6);
+                    net = solver.Solve(net);
+                }
             }
             else
             {
-                var solver = new UniformBinghamSolver();
-                solver.MaxRedidual = Math.Pow(10, -6);
-                solver.reg = Math.Pow(10, -9);
-                var postProcessor = new PostProcessor();
+                var solver = new HerschelBulkleySolver();
+                solver.MaxRedidual = Math.Pow(10, -5);
+                solver.reg = Math.Pow(10, -7);
+                //var postProcessor = new PostProcessor();
                 net = solver.Solve(net);
+
                 //net = postProcessor.PostProcess(net);
             }
-            NetworkRegion.DrawNetwork(net);
-            Name.Text = "Name: " + net.Name;
-            Bingham.Text = "Yield: " + net.YieldPressure;
-            Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
-            FlowRate.Text = "FlowRate: " + net.FlowRate;
-            FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
-            PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
-            PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
-            MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+
+            if(net != null)
+            {
+                NetworkRegion.DrawNetwork(net);
+                Name.Text = "Name: " + net.Name;
+                Bingham.Text = "Yield: " + net.YieldPressure;
+                Nodes.Text = "Nodes: " + net.Nodes + " ^2: " + (net.Nodes * net.Nodes);
+                FlowRate.Text = "FlowRate: " + net.FlowRate;
+                FlowAngle.Text = "FlowAngle: " + net.FlowAngle * 180 / Math.PI + " deg";
+                PressureGrad.Text = "Pressure Gradient: " + net.GradPressure;
+                PressureAngle.Text = "Pressure Angle: " + net.PressAngle * 180 / Math.PI + " deg";
+                MaxRes.Text = "Maximum Residual: " + net.MaxResidual;
+            }
+            else
+            {
+                NetworkRegion.DrawNetwork(selectedNetwork);
+                Name.Text = "Complete";
+            }
         }
 
 
@@ -127,24 +156,6 @@ namespace NetworkDisplay
         {
             selectedNetwork.GradPressure += 0.025 *(double)e.Delta/120d;
             PGrad.Text = Math.Round(selectedNetwork.GradPressure,5).ToString();
-            UpdateCanvas();
-        }
-
-    
-
-        private void NetworkRegion_OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.W || e.Key == Key.Up)
-            {
-                selectedNetwork.PressAngle += 2 * Math.PI / 180;
-            }
-
-            if (e.Key == Key.S || e.Key == Key.Down)
-            {
-                selectedNetwork.PressAngle -= 2 * Math.PI / 180;
-            }
-
-            PressureAngle.Text = Math.Round(selectedNetwork.PressAngle, 5).ToString();
             UpdateCanvas();
         }
 
@@ -157,6 +168,40 @@ namespace NetworkDisplay
         private void HasDepth_OnClick(object sender, RoutedEventArgs e)
         {
            UpdateCanvas();
+        }
+
+        private void MainWindow_OnKeyUp(object sender, KeyEventArgs e)
+        {
+
+            if (e.Key == Key.Up)
+            {
+                selectedNetwork.PressAngle  += 5 * Math.PI / 180;
+                PAngle.Text = Math.Round(selectedNetwork.PressAngle * 180 / Math.PI, 5).ToString();
+                UpdateCanvas();
+            }
+
+            if (e.Key == Key.Down)
+            {
+                selectedNetwork.PressAngle -= 5 * Math.PI / 180;
+                PAngle.Text = Math.Round(selectedNetwork.PressAngle * 180 / Math.PI, 5).ToString();
+                UpdateCanvas();
+            }
+
+            if (e.Key == Key.OemCloseBrackets)
+            {
+                selectedNetwork.ShearIndex += 0.1;
+                SIndex.Text = Math.Round(selectedNetwork.ShearIndex, 5).ToString();
+                UpdateCanvas();
+            }
+
+            if (e.Key == Key.OemOpenBrackets)
+            {
+                selectedNetwork.ShearIndex -= 0.1;
+                SIndex.Text = Math.Round(selectedNetwork.ShearIndex, 5).ToString();
+                UpdateCanvas();
+            }
+
+
         }
     }
 }

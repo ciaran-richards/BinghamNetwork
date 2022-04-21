@@ -81,7 +81,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Solvers\ISolver.cs" />
+    <Compile Include="Solvers\HerschelBulkleySolver.cs" />
+    <Compile Include="Solvers\IterativeSolver.cs" />
+    <Compile Include="Solvers\IIterativeSolver.cs" />
     <Compile Include="Solvers\NewtonianSolver.cs" />
     <Compile Include="Paths.cs" />
     <Compile Include="Networks\CreatorSettings.cs" />
@@ -104,7 +106,8 @@
     </Compile>
     <Compile Include="SolverAPI.cs" />
     <Compile Include="Solvers\PostProcessor.cs" />
-    <Compile Include="Solvers\UniformBinghamSolver.cs" />
+    <Compile Include="Solvers\BinghamSolver.cs" />
+    <Compile Include="Solvers\ShearIndexSolver.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

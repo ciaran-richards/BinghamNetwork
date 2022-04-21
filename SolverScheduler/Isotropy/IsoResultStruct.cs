@@ -10,6 +10,7 @@ namespace SolverScheduler
     {
         public double BinghamGradient { get; set; }
         public double BinghamGradAngle { get; set; }
+        public double ShearIndex { get; set; }
         public double FlowRatioMean { get; set; }
         public double FlowRatioSD { get; set; }
         public double FlowAngleDeltaMean { get; set; }

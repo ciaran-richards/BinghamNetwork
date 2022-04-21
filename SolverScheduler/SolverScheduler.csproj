@@ -69,13 +69,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CsvCreator.cs" />
-    <Compile Include="FlowResultStruct.cs" />
+    <Compile Include="FlowRatio\FlowResultStruct.cs" />
+    <Compile Include="FlowRatio\FlowStudyRunner.cs" />
+    <Compile Include="FlowRatio\FlowResultCreator.cs" />
     <Compile Include="NetworkListMaker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IsoResultCreator.cs" />
-    <Compile Include="IsoResultStruct.cs" />
-    <Compile Include="StudyRunner.cs" />
+    <Compile Include="Isotropy\IsoResultCreator.cs" />
+    <Compile Include="Isotropy\IsoResultStruct.cs" />
+    <Compile Include="Isotropy\IsoStudyRunner.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -87,5 +89,6 @@
       <Name>MainSolver</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
