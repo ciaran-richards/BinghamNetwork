@@ -16,6 +16,7 @@ namespace NetworkDisplay
         private SolverAPI solverApi;
         private Network selectedNetwork;
         private bool isNewtonian;
+        private bool usePostProcessing = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -79,7 +80,7 @@ namespace NetworkDisplay
             net.ShearIndex = shearIndex;
             net.YieldPressure = 0.5;
             
-            selectedNetwork = net;
+            selectedNetwork = net.CopyNoDepth();
             UpdateCanvas();
         }
 
@@ -117,22 +118,25 @@ namespace NetworkDisplay
                 {
                     var solver = new ShearIndexSolver();
                     net.YieldPressure = 0d;
-                    solver.MaxRedidual = Math.Pow(10, -6);
                     net = solver.Solve(net);
                 }
             }
             else
             {
                 var solver = new HerschelBulkleySolver();
-                solver.MaxRedidual = Math.Pow(10, -5);
-                solver.reg = Math.Pow(10, -7);
-                //var postProcessor = new PostProcessor();
+                solver.reg = Math.Pow(10, -8);
+                var postProcessor = new PostProcessor();
                 net = solver.Solve(net);
-
-                //net = postProcessor.PostProcess(net);
+                if (net!= null && usePostProcessing) 
+                    net = postProcessor.PostProcess(net);
             }
 
-            if(net != null)
+            if (net == null)
+            {
+                net = selectedNetwork;
+            }
+
+            if (net != null)
             {
                 NetworkRegion.DrawNetwork(net);
                 Name.Text = "Name: " + net.Name;
@@ -147,6 +151,8 @@ namespace NetworkDisplay
             else
             {
                 NetworkRegion.DrawNetwork(selectedNetwork);
+                selectedNetwork.CalculateResiduals();
+                MaxRes.Text = "Maximum Residual: " + selectedNetwork.MaxResidual.ToString();
                 Name.Text = "Complete";
             }
         }
@@ -201,6 +207,11 @@ namespace NetworkDisplay
                 UpdateCanvas();
             }
 
+            if (e.Key == Key.P)
+            {
+                usePostProcessing = !usePostProcessing;
+                UpdateCanvas();
+            }
 
         }
     }

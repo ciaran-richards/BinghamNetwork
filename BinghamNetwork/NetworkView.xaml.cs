@@ -19,6 +19,7 @@ namespace NetworkDisplay
     {
         private Color forwardFlowColor = Colors.Blue;
         private Color backwardFlowColor = Colors.Red;
+        private Color noFlowColor = Colors.White;
         private SolidColorBrush strokeBrush = new SolidColorBrush(Colors.Black);
         private SolidColorBrush toolTipBrush = new SolidColorBrush(Colors.White);
         private double strokeThickness = 0.5;
@@ -89,6 +90,7 @@ namespace NetworkDisplay
                     if (network.h_Blocked[i][j])
                     {
                         polyg.StrokeDashArray = new DoubleCollection() { 1 };
+                        polyg.Fill = new SolidColorBrush(noFlowColor);
                     }
 
 
@@ -132,6 +134,7 @@ namespace NetworkDisplay
                     if (network.v_Blocked[i][j])
                     {
                         polyg.StrokeDashArray = new DoubleCollection() { 1 };
+                        polyg.Fill = new SolidColorBrush(noFlowColor);
                     }
 
                     polyg.Fill.Opacity = Math.Abs(network.vFlow[i][j] * invMaxFlow);

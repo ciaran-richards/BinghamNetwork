@@ -23,7 +23,7 @@ namespace MainSolver.Solvers
                 {
                     if (Math.Abs(hBingham[i][j]) < 1d)
                     {
-                        net.hFlow[i][j] = 0;
+                        //net.hFlow[i][j] = 0;
                     }
                 }
             }
@@ -35,7 +35,7 @@ namespace MainSolver.Solvers
                 {
                     if (Math.Abs(vBingham[i][j]) < 1)
                     {
-                        net.vFlow[i][j] = 0;
+                        //net.vFlow[i][j] = 0;
                     }
                 }
             }
@@ -63,25 +63,25 @@ namespace MainSolver.Solvers
 
                         if (north && !south && !east && !west)
                         {
-                            net.vFlow[i][j] = 0;
+                            //net.vFlow[i][j] = 0;
                             net.v_Blocked[i][j] = true;
                         }
 
                         if (!north && south && !east && !west)
                         {
-                            net.vFlow[i][j - 1] = 0;
+                            //net.vFlow[i][j - 1] = 0;
                             net.v_Blocked[i][j-1] = true;
                         }
 
                         if (!north && !south && east && !west)
                         {
-                            net.hFlow[i][j] = 0;
+                            //net.hFlow[i][j] = 0;
                             net.h_Blocked[i][j] = true;
                         }
 
                         if (!north && !south && !east && west)
                         {
-                            net.hFlow[i - 1][j] = 0;
+                            //net.hFlow[i - 1][j] = 0;
                             net.h_Blocked[i-1][j] = true;
                         }
                     }

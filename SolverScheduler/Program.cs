@@ -14,10 +14,10 @@ namespace SolverScheduler
         static void Main(string[] args)
         {
             var studyRunner = new IsoStudyRunner();
-            studyRunner.RunStudy();
+            //studyRunner.RunStudy();
 
             var flowStudyRunner = new FlowStudyRunner();
-            //flowStudyRunner.RunStudy();
+            flowStudyRunner.RunStudy();
 
             Console.ReadLine();
 
