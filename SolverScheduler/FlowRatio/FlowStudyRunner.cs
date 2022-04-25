@@ -12,7 +12,7 @@ namespace SolverScheduler.FlowRatio
         public void RunStudy()
         {
 
-            double index = 0.6;
+            double index = 0.9;
             var creatorSettings = new CreatorSettings();
             
             creatorSettings.Length = 1;
@@ -54,20 +54,20 @@ namespace SolverScheduler.FlowRatio
 
             var csvWritter = new CsvCreator();
 
-            csvWritter.CreateCsv(flowResults, "N60");
+            csvWritter.CreateCsv(flowResults, "N90");
 
-            index = 0.3;
+            //index = 0.1;
 
-            var flowResults2 = new List<FlowResultStruct>(PGradList.Capacity);
+            //var flowResults2 = new List<FlowResultStruct>(PGradList.Capacity);
 
-            foreach (var pGrad in PGradList)
-            {
-                flowResults2.Add(flowCreator.EvaluateFlow(N8List, N16List, N32List, pGrad, index));
-            }
+            //foreach (var pGrad in PGradList)
+            //{
+            //    flowResults2.Add(flowCreator.EvaluateFlow(N8List, N16List, N32List, pGrad, index));
+            //}
 
-            csvWritter.CreateCsv(flowResults2, "N30");
+            //csvWritter.CreateCsv(flowResults2, "N10");
 
-            int h = 8;
+            //int h = 8;
         }
     }
 }
