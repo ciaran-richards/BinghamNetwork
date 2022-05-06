@@ -73,6 +73,10 @@
     <Compile Include="FlowRatio\FlowStudyRunner.cs" />
     <Compile Include="FlowRatio\FlowResultCreator.cs" />
     <Compile Include="NetworkListMaker.cs" />
+    <Compile Include="PowerLaw\IsoPowResultCreator.cs" />
+    <Compile Include="PowerLaw\PowerLawResultCreator.cs" />
+    <Compile Include="PowerLaw\IsoPowerLawStudyRunnner.cs" />
+    <Compile Include="PowerLaw\PowerLawStudyRunnner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Isotropy\IsoResultCreator.cs" />
