@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MainSolver;
 using SolverScheduler.FlowRatio;
+using SolverScheduler.PowerLaw;
 
 namespace SolverScheduler
 {
@@ -17,7 +18,13 @@ namespace SolverScheduler
             //studyRunner.RunStudy();
 
             var flowStudyRunner = new FlowStudyRunner();
-            flowStudyRunner.RunStudy();
+            //flowStudyRunner.RunStudy();
+
+            var powerLawStudyRunner = new PowerLawStudyRunnner();
+            //powerLawStudyRunner.RunStudy();
+
+            var isoPowTest = new IsoPowerLawStudyRunnner();
+            isoPowTest.RunStudy();
 
             Console.ReadLine();
 

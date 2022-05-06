@@ -8,7 +8,7 @@ using MainSolver.Solvers;
 
 namespace SolverScheduler
 {
-    class IsoResultCreator
+    public class IsoPowResultCreator
     {
 
         private NetworkCreator NetworkCreator;
@@ -22,7 +22,7 @@ namespace SolverScheduler
             
             double angle;
             var ResultRange = new List<IsoResultStruct>(MaxAngle+1);
-            for (double i = MaxAngle; i >= 0; i = i-22.5)
+            for (double i = MaxAngle; i >= 0; i = i-5)
             {
                 angle = i * Rad;
                 ResultRange.Add(Evaluate(Networks, pGrad, angle, index));
@@ -33,8 +33,6 @@ namespace SolverScheduler
 
         public IsoResultStruct Evaluate(Network[] Networks, double pGrad, double pAngle, double index)
         {
-            var HBSolver = new HerschelBulkleySolver();
-            var BinghamSolver = new BinghamSolver();
             var SIndSolver = new ShearIndexSolver();
             var NewtonSolver = new NewtonianSolver();
 
@@ -50,7 +48,6 @@ namespace SolverScheduler
             double SumAngleDelta = 0;
 
             Network newtonNet;
-            Network hbNet;
             Network sindNet;
 
             for (int i = 0; i < Count; i++)
@@ -60,10 +57,7 @@ namespace SolverScheduler
                 Networks[i].ShearIndex = index;
                 Networks[i].PressAngle = pAngle;
                 newtonNet = NewtonSolver.Solve(Networks[i].Copy());
-                hbNet = HBSolver.Solve(Networks[i].Copy());
-
-
-
+                
                 if (Math.Abs(index - 1) < 0.000000001)
                 {
                     sindNet = newtonNet;
@@ -73,16 +67,16 @@ namespace SolverScheduler
                     sindNet = SIndSolver.Solve(Networks[i].Copy());
                 }
 
-                if (hbNet != null && sindNet!=null)
+                if (sindNet!=null)
                 {
-                    flowArray[i] = hbNet.FlowRate / sindNet.FlowRate;
+                    flowArray[i] = sindNet.FlowRate/newtonNet.FlowRate;
                     SumFlow += flowArray[i];
                     FlowSamples += 1;
 
-                    angleDeltaArray[i] = (hbNet.FlowAngle - sindNet.FlowAngle);
-                    if (! (double.IsNaN(hbNet.FlowAngle)||double.IsNaN(sindNet.FlowAngle)) )
+                    angleDeltaArray[i] = (sindNet.FlowAngle - newtonNet.FlowAngle);
+                    if (! double.IsNaN(sindNet.FlowAngle) )
                     {
-                        SumAngleDelta += (hbNet.FlowAngle - sindNet.FlowAngle);
+                        SumAngleDelta += (sindNet.FlowAngle-newtonNet.FlowAngle);
                         AngleSamples += 1;
                     }
 
@@ -130,7 +124,7 @@ namespace SolverScheduler
             }
             
             var result = new IsoResultStruct();
-            result.BinghamGradient = pGrad / (2 * YieldPressure);
+            result.BinghamGradient = pGrad;
             result.BinghamGradAngle = pAngle * Deg;
             result.ShearIndex = index;
             result.FlowRatioMean = flowMean;

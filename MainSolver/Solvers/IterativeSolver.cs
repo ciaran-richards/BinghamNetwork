@@ -105,7 +105,6 @@ namespace MainSolver.Solvers
                             //Derivative wrt RH node Pressure - Except Right Bound.
                             row[u + 1] = 
                                 FlowDerivative(hdP[p][q], net.hWidth[p][q], net.inv_hLength[p][q], yield, net.ShearIndex);
-
                         }
 
                         if (p == 0 && q > 0)

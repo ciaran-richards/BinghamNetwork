@@ -20,17 +20,8 @@ namespace SolverScheduler
 
         public FlowResultStruct EvaluateFlow(Network[] rough, Network[] medium, Network[] fine, double pGrad, double index)
         {
-            //var u0r = EvaluateAngle(rough, pGrad, 0, index);
 
-            //var u0m = EvaluateAngle(medium, pGrad, 0, index);
-
-            //var u0f = EvaluateAngle(fine, pGrad, 0, index);
-            
             var uMf = EvaluateAngle(fine, pGrad, MaxAngle, index);
-
-            //var p0 = Math.Abs(Math.Log10((u0f - u0m) / (u0m - u0r)) * InvLog2);
-
-            //var u0Inf = u0f + (u0f - u0m) / (Math.Pow(2, p0) - 1);
 
             var result = new FlowResultStruct();
             result.BinghamGrad = pGrad;
